@@ -28,11 +28,11 @@ String[] entity_levels = { "tiny", "titchy", "miniscule", "small", "medium", "la
 // Level costs
 // Fire and air might be correct, but other costs are just placeholders
 // http://batwiki.wx.fi/wiki/Rift_entity_reputation
-int[] fire_level_cost =  {0,	25,		220,     680,	1600,    3125,   5400,	8570,	10000,	25030 };
-int[] air_level_cost =   {0,	25,		220,     810,	1920,    3750,   6480,	8570,	10000,	25030 };
-int[] water_level_cost = {0,	50,		220,    1350,	3200,    3125,   5400,	8570,	10000,	25030 };
-int[] earth_level_cost = {0,	25,		220,    1980,	4480,    3125,   15125,	8570,	10000,	25030 };
-int[] magic_level_cost = {0,	25,		220,    1980,	4480,    3125,   15125,	8570,	10000,	25030 };
+int[] fire_level_cost =  {0,	25,	220,	680,	1600, 	3125,	 5400,	8570,	10000,	25030 };
+int[] air_level_cost =   {0,	25,	220,	810,	1920, 	3750,	 6480,	8570,	10000,	25030 };
+int[] water_level_cost = {0,	50,	220,	1350,	3200,	3125,	 5400,	8570,	10000,	25030 };
+int[] earth_level_cost = {0,	25,	220,	1980,	4480,	3125,	15125,	8570,	10000,	25030 };
+int[] magic_level_cost = {0,	25,	220,	1980,	4480,	3125,	15125,	8570,	10000,	25030 };
 
 void bootup() {
 	triggerManager.newTrigger("entity_rep_grabber",
