@@ -4,6 +4,8 @@ SCRIPT_OFF = false;
 
 // Modified from Hair's barbarian rep counter
 // Not tested with magic entity
+// probably broken if you have >10000 rep
+//
 // Erygon 2014
 
 
