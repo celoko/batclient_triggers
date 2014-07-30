@@ -1,0 +1,215 @@
+SCRIPT_NAME = "bm";
+SCRIPT_DESC = "Triggers for beastmaster";
+
+// Buff tracker shows last time when skill was used.
+// Usage: $bm.show
+//
+// Not tested in a while
+//
+// Erygon 2014
+
+
+
+import java.util.Date;
+
+// Set channel e.g. "@@party say"
+String output = "@@party report";
+
+// Mount name for buff reporting
+String mountName = "";
+String buffName = "";
+
+Long rugTime = 0;
+Long rtPainTime = 0;
+Long rtFrostTime = 0;
+Long rtFlameTime = 0;
+
+Long min = 0;
+Long sec = 0;
+Long secTemp = 0;
+
+public void dismounted(){
+	// Inform party
+	clientGUI.doCommand( output+" Dismounted!" );
+	// Lead mount, you should use: alias mymount mount_name
+	clientGUI.doCommand( "lead mymount" );
+}
+
+public void rtBuffActive(){
+    
+	buffName = vars.get(1);
+
+    if ( buffName.equals("reluctantly slinks forward")   ){
+        clientGUI.doCommand( output+" Ride underground active." );
+        rugTime = System.currentTimeMillis();
+    } else if ( buffName.equals("pain")  ){
+        clientGUI.doCommand( output+" Ride through pain active." );
+		rtPainTime = System.currentTimeMillis();
+    } else if ( buffName.equals("cold") ) {
+        clientGUI.doCommand( output+" Ride through frost active." );
+        rtFrostTime = System.currentTimeMillis();
+    } else if ( buffName.equals("fire") ) {
+        clientGUI.doCommand( output+" Ride through flame active." );
+        rtFlameTime = System.currentTimeMillis();
+    }
+}
+
+// Inform when buffs drop
+public void rtBuffDrop(){
+	buffName = vars.get(2);
+
+	if ( buffName.equals("being underground")  ){
+        clientGUI.doCommand( output+" Ride underground dropping. ("+getTimeDiff(rugTime)+")" );
+	} else if ( buffName.equals("pain")  ){
+		clientGUI.doCommand( output+" Ride through pain dropping. ("+getTimeDiff(rtPainTime)+")" );
+	} else if ( buffName.equals("cold") ) {
+		clientGUI.doCommand( output+" Ride through frost dropping. ("+getTimeDiff(rtFrostTime)+")" );
+	} else if ( buffName.equals("fire") ) {
+		clientGUI.doCommand( output+" Ride through flame dropping. ("+getTimeDiff(rtFlameTime)+")" );
+	}
+}
+
+public void mountHungry(){
+    // Inform rider
+    clientGUI.printText("general", "Mount is hungry!\n");
+}
+
+public void offmount(){
+    // Inform rider
+    clientGUI.printText("general", "YOU ARE OFF YOUR MOUNT!\n");
+}
+
+public void cannotStoreMount(){
+    // Inform rider
+    clientGUI.printText("general", "CANNOT STORE MOUNT! Empty sabblebags.\n");
+    // Lead mount
+    clientGUI.doCommand( "lead mount" );
+}
+
+public void stableFull(){
+    // Inform rider
+    clientGUI.printText("general", "CANNOT STORE MOUNT! Stable full.\n");
+    // Lead mount
+    clientGUI.doCommand( "lead mount" );
+}
+
+public void scanMount(){
+    clientGUI.doCommand( "scan mymount" );
+}
+
+// Show buff times
+public void show(){
+	// Usage: $bm.show
+
+	clientGUI.printText("general", "rug: "+getTimeDiff(rugTime)+" pain: "+getTimeDiff(rtPainTime)+" frost: "+getTimeDiff(rtFrostTime)+" flame: "+getTimeDiff(rtFlameTime)+"\n");
+	
+}
+	
+// convert milliseconds to minutes and seconds or seconds
+// if time is over 50min, show n/a
+public getTimeDiff(Long time){
+
+	secTemp = (System.currentTimeMillis() - time)/1000;
+
+	if ( secTemp > 3000 ) {
+		return "n/a";
+	}
+    
+    if ( secTemp > 60 ) {
+        min = Math.floor(secTemp/60);
+        sec = secTemp - min * 60;
+
+		return min+"m"+sec+"s";
+	}
+	else
+	{
+		return secTemp+"s";
+	}
+}
+
+void bootup(){
+	// Dismount messages
+	triggerManager.newTrigger("bm_dismount1",
+		"^You are knocked off your mount!$",
+		"$"+SCRIPT_NAME+".dismounted", false, false, false,
+		null, Font.PLAIN);	
+		
+    triggerManager.newTrigger("bm_dismount2",
+        "^Your annoyed mount throws you!$",
+        "$"+SCRIPT_NAME+".dismounted", false, false, false,
+        null, Font.PLAIN);
+
+    triggerManager.newTrigger("bm_dismount3",
+        "^Your mount throws you!$",
+        "$"+SCRIPT_NAME+".dismounted", false, false, false,
+        null, Font.PLAIN);
+
+    triggerManager.newTrigger("bm_offmountLite",
+        "^You are now off your mount.$",
+        "$"+SCRIPT_NAME+".offmount", false,true,false,new Color[]{new Color(255,0,51)}, Font.PLAIN);
+
+	// Rug
+	triggerManager.newTrigger("bm_rug_active",
+		"^It responds to the motivation and (reluctantly slinks forward).$",
+		"$"+SCRIPT_NAME+".rtBuffActive", false, false, false,
+		null, Font.PLAIN);
+
+	// Ride through x up
+    triggerManager.newTrigger("bm_rtbuff_active",
+		//"^(It|Your mount) responds to the motivation and (reluctantly slinks forward|ignores (pain|cold|fire)).$",
+        "^Your mount responds to the motivation and ignores (pain|cold|fire).$",
+        "$"+SCRIPT_NAME+".rtBuffActive", false, false, false,
+        null, Font.PLAIN);
+
+    // Buffs down
+    triggerManager.newTrigger("bm_rtbuff_drop",
+        "^You think that ([A-Za-z -]*) should be worried about (being underground|pain|cold|fire) right about now.$",
+        //"You think that ([A-Za-z -]*) should be worried about (being underground|pain|cold|fire) right about now.",
+        "$"+SCRIPT_NAME+".rtBuffDrop", false, false, false,
+        null, Font.PLAIN);
+
+	// Other stuff 
+    triggerManager.newTrigger("bm_mount_hungry",
+        "([A-Za-z -]*) cannot be ridden right now.$",
+        "$"+SCRIPT_NAME+".mountHungry", false, false, false,
+        null, Font.PLAIN);
+
+    triggerManager.newTrigger("bm_cannot_store",
+        "^You cannot store a mount with items in its saddlebags.$",
+        "$"+SCRIPT_NAME+".cannotStoreMount", false, false, false,
+        null, Font.PLAIN);
+
+    triggerManager.newTrigger("bm_stable_full",
+        "^Sadly there is no room in the stable at this time.$",
+        "$"+SCRIPT_NAME+".stableFull", false, false, false,
+        null, Font.PLAIN);
+
+	// Some passive offu lites, untested
+    // Golden griffon
+	triggerManager.newTrigger( "bm_lite_ggriffon",
+	"tries to dodge ([A-Za-z -]*) onslaught, but gets magically roasted instead!",
+	"",	false,true,false,new Color[]{new Color(255,0,51)}, Font.PLAIN);	
+
+    // Hoar frost gryphon
+    triggerManager.newTrigger( "bm_lite_gryphon",
+    "tries to avoid Hoar frost gryphons\'s icy attack, but is frozen instead!",
+    "", false,true,false,new Color[]{new Color(255,0,51)}, Font.PLAIN);
+
+    // Giant crab
+    triggerManager.newTrigger( "bm_lite_crab",
+    "SNIVELS as the giant crab RENDS it!",
+    "", false,true,false,new Color[]{new Color(255,0,51)}, Font.PLAIN);
+
+    // Ancient drake
+    triggerManager.newTrigger( "bm_lite_adrake",
+    "tries to outwit Ancient chaos drake, but fails and gets IMPALED instead!!",
+    "", false,true,false,new Color[]{new Color(255,0,51)}, Font.PLAIN);
+
+	// Scan mount every 10 rounds, just in case..
+    triggerManager.newTrigger("bm_scan_mount",
+        "Round [0-9]0",
+        "$"+SCRIPT_NAME+".scanMount", false, false, false,
+        null, Font.PLAIN);
+}
+
+
