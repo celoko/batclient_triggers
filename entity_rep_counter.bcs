@@ -1,0 +1,123 @@
+SCRIPT_NAME = "entity_rep_counter";
+SCRIPT_DESC = "Shows entity rep in numbers";
+SCRIPT_OFF = false;
+
+// Modified from Hair's barbarian rep counter
+// Not tested with magic entity
+// Erygon 2014
+
+
+// Entity names, change to match your own entities
+String fire_name  = "Aodh";
+String air_name   = "";
+String water_name = "";
+String earth_name = "";
+String magic_name = "";
+
+String entity_type   = "";                                                                                         
+String entity_humour = ""; 
+
+// Ansi color codes, "\033[0m" clears all color
+String colB = "";
+String colA = "\033[0m";		
+
+// Level names
+String[] entity_levels = { "tiny", "titchy", "miniscule", "small", "medium", "large", "huge", "enormous", "humoungous", "garantuan" };
+// Level costs
+// Fire and air might be correct, but other costs are just placeholders
+// http://batwiki.wx.fi/wiki/Rift_entity_reputation
+int[] fire_level_cost =  {0,	25,		220,     680,	1600,    3125,   5400,	8570,	10000,	25030 };
+int[] air_level_cost =   {0,	25,		220,     810,	1920,    3750,   6480,	8570,	10000,	25030 };
+int[] water_level_cost = {0,	50,		220,    1350,	3200,    3125,   5400,	8570,	10000,	25030 };
+int[] earth_level_cost = {0,	25,		220,    1980,	4480,    3125,   15125,	8570,	10000,	25030 };
+int[] magic_level_cost = {0,	25,		220,    1980,	4480,    3125,   15125,	8570,	10000,	25030 };
+
+void bootup() {
+	triggerManager.newTrigger("entity_rep_grabber",
+		"^\\| (Fire|Aodh|Air|Water|Earth) ([ ]*) \\| ([o]*)([!]*)([:]*)([,]*)([.]*) \\| (Pleased|Narked ) \\|$",
+		"$"+SCRIPT_NAME+".entity_rep_grabber",true,false,false,null,Font.PLAIN);
+
+	// Gag title line and print another
+	triggerManager.newTrigger("entity_rep_title_grabber",
+		"^\\| Entity    \\| Power                                              \\| Humour  \\|$",
+		"$"+SCRIPT_NAME+".printTitle",true,false,false,null,Font.PLAIN);
+
+	// Inform when establish entity control is off
+    triggerManager.newTrigger("entity_eec_down",
+        "^Your entity has trouble understanding you.$",
+        "$"+SCRIPT_NAME+".eec_down", false, false, false,
+        null, Font.PLAIN);
+
+    // Inform when entity dies.
+    triggerManager.newTrigger("entity_dead",
+        "^Your soul cries out in anguish as your faithful companion is slain!$",
+        "$"+SCRIPT_NAME+".entity_dead", false, false, false,
+        null, Font.PLAIN);
+}
+
+// INFOS
+public void eec_down(){ clientGUI.printText("general", "--- EEC DOWN! ---\n"); }
+public void entity_dead(){ clientGUI.printText("general", "--- ENTITY IS DEAD! ---\n"); }
+
+// Your entity has trouble understanding you.
+
+// returns cost of next level
+// also sets color of the type
+static entity_level_check(String type,int rep_amount) {
+	// Type or name
+	if ( type.equals("Fire") || type.equals( fire_name ) ) {
+		colB = "\033[1m\033[31m";
+		return getNextCost(rep_amount, fire_level_cost);
+	}
+	else if ( type.equals("Air") || type.equals( air_name ) ) {
+		colB = "\033[1m\033[36m";
+		return getNextCost(rep_amount, air_level_cost);
+	}
+	else if ( type.equals("Water") || type.equals( water_name ) ) {
+		colB = "\033[1m\033[34m";
+		return getNextCost(rep_amount, water_level_cost);
+	}
+	else if ( type.equals("Earth") || type.equals( earth_name ) ) {
+		colB = "\033[1m\033[33m";
+		return getNextCost(rep_amount, earth_level_cost);
+	}
+	else if ( type.equals("Magic") || type.equals( magic_name ) ) {
+		colB = "\033[1m\033[35m";
+		return getNextCost(rep_amount, magic_level_cost);
+	}
+	{ return 0; }
+}
+
+static getNextCost(int rep_amount, int[] costs){
+	for (int i=0;i < costs.length; i++ ) {
+		if ( rep_amount < costs[i] ) { 
+			return costs[i];                                                         
+		}
+	}
+}
+
+void printTitle()  {
+	clientGUI.printText("general", "| Entity \t  | Power \t | Next \t\t\t\t   | Humour  |\n");
+}
+
+void entity_rep_grabber()  {
+	int totalRep =0;
+	int repNeeded=0;
+
+	entity_type		= vars.get(1);
+	entity_humour	= vars.get(8);
+
+	// Turn symbols into numbers
+	totalRep = (vars.get(3).length() * 1000) + (vars.get(4).length() * 100);
+	totalRep = totalRep + (vars.get(5).length() * 10) + vars.get(6).length();
+
+	// Get next level cost and correct color
+ 	nextLevel = entity_level_check( entity_type, totalRep );
+ 	repNeeded = nextLevel - totalRep;
+
+ 	// Add tab when numbers get too big
+ 	if ( nextLevel < 1000 ) { nextLevel=nextLevel + "\t"; }
+
+// Print the results
+	clientGUI.printText("general", "| " + colB + entity_type + colA + "\t  | " + totalRep + " \t | " + repNeeded + "\t\t\t\t   | " +entity_humour+ " |\n");
+}
