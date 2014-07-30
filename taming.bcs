@@ -1,0 +1,131 @@
+SCRIPT_NAME = "taming";
+SCRIPT_DESC = "Taming counter";
+// Erygon 2014
+
+// Shows info about taming sessions
+
+// Notes
+// not impressed and making progress can come at same time
+// horribly wrong and harder to tame
+
+// not impressed is + and sometimes with progress
+// horribly wrong is - and sometimes with harder to tame
+
+int notImpressed = 0;
+int horribly = 0;
+
+int successFail = 0;
+int progress = 0;
+int sessions = 0;
+
+String mountName = "";
+String tempName = "temp";
+
+// not impressed = S
+// horribly wrong = F
+String minProgress = "";
+
+// making progress +  harder to tame -
+String mainProgress = "";
+
+void newSession(){ 
+	sessions++;
+}
+
+void addProgress(){	
+	progress++; 
+	mainProgress += "+";
+}
+
+void delProgress(){
+	checkName( vars.get(1) );
+	progress--; 
+	mainProgress += "-";
+}
+
+void addHorrible(){	
+	checkName( vars.get(1) );
+	minProgress += "F";
+	successFail--;
+}
+
+void notImpressed(){
+	checkName( vars.get(1) );
+	successFail++;
+	minProgress += "S";
+}
+
+void tamed(){ 
+	checkName( vars.get(1) );
+	showWin();
+	mountName = "n/a";
+	clear();
+}
+
+void shoutMaster(){ 
+	clientGUI.printText("general", "Master! Master!\n");
+}
+
+void show(){
+	clientGUI.printText("general", "Name: "+mountName+" | Tries: "+sessions+" | Progress: ["+mainProgress+"] ("+progress+") ["+minProgress+"] ("+successFail+")\n");
+}
+
+void showWin(){
+	clientGUI.printText("general", "Name: "+mountName+" | Tries: "+sessions+" | Progress: ["+mainProgress+"] ("+progress+") ["+minProgress+"] ("+successFail+") win\n");
+}
+
+// Check mount name, if its different from old name, clear tame stats
+void checkName( String name ){
+	if ( !name.equals(mountName) ) {
+		clear();
+		newSession();
+		mountName = name;
+	} else if ( mountName.equals("") ) {
+		mountName = name;
+	}
+}
+
+void clear(){
+	progress 	= 0;
+	successFail = 0;
+	sessions 	= 0;
+	minProgress 	= "";
+	mainProgress 	= "";
+}
+
+void bootup(){
+	triggerManager.newTrigger("notImpressed",
+		"^([A-Za-z -]+) does not seem impressed.$",
+		"$"+SCRIPT_NAME+".notImpressed", false, false, false,
+		new Color[]{new Color(51,255,51)}, Font.PLAIN);		
+
+	triggerManager.newTrigger("makingProgress",
+		"^However you feel you are making progress.$",
+		"$"+SCRIPT_NAME+".addProgress", false, false, false,
+		new Color[]{new Color(51,255,51)}, Font.PLAIN);
+
+	triggerManager.newTrigger("horriblyWrong",
+		"^You do something HORRIBLY wrong and piss ([A-Za-z -]+) off!$",
+		"$"+SCRIPT_NAME+".addHorrible", false, false, false,
+		new Color[]{new Color(51,255,51)}, Font.PLAIN);
+
+	triggerManager.newTrigger("harderToTame",
+		"^([A-Za-z -]+) is so traumatized that it becomes harder to tame.$",
+		"$"+SCRIPT_NAME+".delProgress", false, false, false,
+		new Color[]{new Color(51,255,51)}, Font.PLAIN);
+
+	triggerManager.newTrigger("newSession",
+		"^You begin the taming session.$",
+		"$"+SCRIPT_NAME+".newSession", false, false, false,
+		new Color[]{new Color(51,255,51)}, Font.PLAIN);
+
+	triggerManager.newTrigger("tamedMount",
+		"^After a while, ([A-Za-z -]+) bows down in submission.$",
+		"$"+SCRIPT_NAME+".tamed", false, false, false,
+		new Color[]{new Color(51,255,51)}, Font.PLAIN);
+
+	triggerManager.newTrigger("masterMaster",
+		"^([A-Za-z -]+) seems truly broken by your masterful taming techniques.$",
+		"$"+SCRIPT_NAME+".shoutMaster", false, false, false,
+		new Color[]{new Color(51,255,51)}, Font.PLAIN);
+}
