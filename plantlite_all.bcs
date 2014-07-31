@@ -1,0 +1,151 @@
+SCRIPT_NAME = "plantlite_all";                                                                                    
+SCRIPT_DESC = "Lite plants";                                                                              
+SCRIPT_OFF = false;
+
+import java.util.*; 
+
+// Info color
+yellow = new Color[]{new Color(255,255,0)};
+
+List seasons = new ArrayList();
+seasons.add("autumn");
+seasons.add("spring");
+seasons.add("summer");
+seasons.add("winter");
+
+// Plant match names
+String[] match_autumn = {"apple tree", "baneberry", "barberry", "blood moss", "blueberry", "buttercup", "cacao", "cactus", "chickweed", "cotton", "corn", "death cap", "grape", "h\'cliz", "jaslah", "lingonberry", "mangrel", "mistletoe", "mugwort", "papaya", "pine", "thistle", "wormwood", "yarrow"};
+
+String[] match_spring = {"cactus", "buttercup", "cacao", "chickweed", "mangrel", "mushroom", "rhubarb", "water lily"};
+
+String[] match_summer = {"arnica", "cactus", "blueberry", "boneset", "borage", "burdock", "buttercup", "cabbage", "cacao", "carrot", "cauliflower", "costmary", "date", "elder", "foxglove", "garlic", "hemlock", "henbane", "honeysuckle", "jimsonweed", "lettuce", "lingonberry", "lobelia", "lungwort", "mangrel", "mystic carrot", "mystic spinach", "nightshade", "oak", "onion", "papaya", "pear", "plum", "potato", "raspberry", "rhubarb", "rose", "spinach", "strawberry", "tomato", "turnip", "vine", "water lily", "wheat", "wolfbane" };
+
+String[] match_winter = { "cactus", "bearberry", "bloodroot", "cacao", "chickweed", "chicory", "comfrey",
+	"crystalline", "death cap", "ginseng", "holly", "mandrake", "mangrel", "papaya", "soapwort", "sweet flag" };
+
+// Full(ish) descs
+String[] herbs_autumn = { 
+	"An apple tree that is now harvestable is growing here",
+	"The stems of a baneberry plant are covered with its eye-like fruit",
+	"A fully grown barberry bush is here",
+	"A bearberry shrub grows here",
+	"A large outgrowth of blood moss ready to be picked grows nearby",
+	"A blueberry bush with the last of its fruit is growing here",
+	"A buttercup plant grows here",
+	"A cacao tree grows here",
+	"A chickweed plant lies growing in knots on the floor",
+	"A tall and healthy corn plant grows here",
+	"A barrel cactus stands here",
+	"A fully grown cotton shrub is here",
+	"A garlic plant stands here",
+	"A ginseng plant is here",
+	"A flowering dry yarrow plant stands here",
+	"An onion plant stands here" };
+
+String[] herbs_spring = { "test" };
+String[] herbs_summer = { "test" };
+String[] herbs_winter = { "test" };
+
+
+void run(){
+	// When no argument, add all seasons
+  	if (argument == null || ("".equals(argument)) ) {
+		argument = "autumn spring summer winter";
+	}
+	// Empty list
+	seasons.clear();
+	// Add new seasons
+	if (argument.contains("autumn")){ seasons.add("autumn"); }
+	if (argument.contains("spring")){ seasons.add("spring"); }
+	if (argument.contains("summer")){ seasons.add("summer"); }
+	if (argument.contains("winter")){ seasons.add("winter"); }
+	if (argument.contains("none")){	
+		// Turn trigger off
+		clientGUI.doCommand("/untrig pl_plantMatcher3");
+		clientGUI.printText("general", "Selected seasons: "+argument+".\n");
+		return;
+	}
+
+
+	clientGUI.printText("general", "Selected seasons: "+argument+".\n");
+	makeRegexp();
+
+}
+
+static checkHerb(){
+
+	// Get full matched line
+	String match = vars.get(0);
+	
+	// Remove linebreaks
+	match = match.replace("\n", "").replace("\r", "");
+
+	// Stop if match is tell or similar
+	if ( match.contains("tells you") ) { return; }
+
+	if ( checkSeason( herbs_autumn, match ) == true ) { printInfo(); }
+}
+
+// Goes through season herb list
+static checkSeason(String[] list, String match) {
+	for (int x=0;x<list.length;x++) {
+		if ( match.contains(list[x]) ) { return true; }
+	}
+}
+
+// Inform user
+void printInfo(){
+	clientGUI.printText("general", "Found " + vars.get(1) + "!\n", "#FFFF00");
+}
+
+// Creates trigger regexp from selected seasons with no duplicate plants
+static makeRegexp(){
+	
+	String match_combined = "(";
+	for (String season : seasons) {
+		if ( season.contains("autumn") ) {
+			for (int i=0;i<match_autumn.length;i++) {
+				match_combined += match_autumn[i] + "|";
+			}
+		}else if ( season.contains("spring") ) {
+			for (int i=0;i<match_spring.length;i++) {
+				if ( !match_combined.contains(match_spring[i]) ) {
+					match_combined += match_spring[i] + "|";
+				}
+			}
+		}else if ( season.contains("summer") ) {
+			for (int i=0;i<match_summer.length;i++) {
+				if ( !match_combined.contains(match_summer[i]) ) {
+					match_combined += match_summer[i] + "|";
+				}
+			}
+		}else if ( season.contains("winter") ) {
+			for (int i=0;i<match_winter.length;i++) {
+				if ( !match_combined.contains(match_winter[i]) ) {
+					match_combined += match_winter[i] + "|";
+				}
+			}
+		}
+	}
+	match_combined += ")";
+	// Replace last delim
+	match_combined = match_combined.replace("|)", ")");
+	
+	clientGUI.printText("general", "Matcher: " + match_combined + "\n", "#FFFF00");
+
+//	clientGUI.doCommand(			"/trig pl_plantMatcher2 "+match_combined+" $"+SCRIPT_NAME+".checkHerb");
+//  clientGUI.printText("general", 	"/trig pl_plantMatcher2 "+match_combined+" $"+SCRIPT_NAME+".checkHerb"); 
+
+
+	// Create trigger with new regexp
+	triggerManager.newTrigger("pl_plantMatcher3",
+    	""+match_combined+"",
+		"$"+SCRIPT_NAME+".checkHerb", false, false, true, yellow, Font.PLAIN);
+}
+
+
+void bootup() {
+	// Generate trigger to match plants
+	makeRegexp();
+}
+
