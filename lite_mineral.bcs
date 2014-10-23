@@ -1,0 +1,134 @@
+// Usage: '$lite_mineral all' to lite all minerals
+// 		  '$lite_mineral show' to show selected minerals
+// 		  '$lite_mineral ruby diamond basalt' to set minerals
+//		  '$lite_mineral bell' tp toggle bell 
+
+SCRIPT_NAME = "lite_mineral";                                                                                    
+SCRIPT_DESC = "Lite minerals";                                                                              
+SCRIPT_OFF = false;
+
+import java.util.*; 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+// Info color
+yellow = new Color[]{new Color(255,255,0)};
+
+boolean bell = false;
+//boolean checkCoords = false;
+
+String result = "";
+
+Pattern pattern = Pattern.compile("(deposit|abyss|lode|graveyard|protrusion|slab|crag|gloss|hill) of ([a-z]+)");
+
+List minerals = new ArrayList();
+minerals.add("all");
+
+static checkMatch(){
+
+	// Get full desctription
+	String desc = vars.get(0);
+	
+	// Remove linebreaks and replace multiple spaces with single space
+	desc = desc.replace("\n", "").replace("\r", "").replaceAll(" +", " ");
+
+	// Stop if match is tell or similar
+	if ( desc.contains("tells you") || desc.contains("You tell") ) { return; }
+
+	Matcher matcher = pattern.matcher(desc);
+
+	if (matcher.find()) {
+		result = matcher.group(2);
+
+		if ( minerals.get(0).equals("all") ) {
+			getLocation();
+		} else {
+			for	( String mineral : minerals ) {
+				if (mineral.equals(result)) { getLocation(); }
+			}
+		}
+	}
+}
+
+void getLocation(){
+
+	clientGUI.doCommand( "/trigenable MineralGetCoordinate" );
+	
+//	checkCoords=true;
+	clientGUI.doCommand( "@@whereami" );
+
+}
+
+void showLites() {
+
+	if (bell == true ) {
+		clientGUI.printText("general", "Bell: on\n", "#FFFF00");
+	} else {
+		clientGUI.printText("general", "Bell: off\n", "#FFFF00");
+	}
+
+	clientGUI.printText("general", "Now liting: " + minerals.toString() + "\n", "#FFFF00");
+}
+
+void printInfo() {
+
+    if (bell == true ) {
+        clientGUI.doCommand("/bell");
+    }
+
+//	if (checkCoords == true ) { 
+		String cont = vars.get(2);
+		int	coordX = Integer.parseInt( vars.get(3) );
+		int	coordY = Integer.parseInt( vars.get(4) );
+
+	//clientGUI.printText("general", "Coords: " + cont + " at " +coordX+","+coordY+"\n", "#FFFF00");
+
+	clientGUI.printText("general", "FOUND " + result + "! " + cont + " X:" + coordX + " Y:" + coordY +"\n", "#FFFF00");
+		clientGUI.doCommand( "/trigdisable MineralGetCoordinate" );
+//		checkCoords = false;
+//	}
+
+}
+
+
+void run(){
+
+	// When no argument, lite all minerals
+  	if (argument == null || ("".equals(argument)) ) {
+		argument = "all";
+	} else if ( argument.equals("show") ) {
+	} else if (argument.equals("bell") ) {
+		if ( bell == false ) { 
+			bell = true; 
+		} else { 
+			bell = false; 
+		}
+ 	} else {
+		minerals.clear();
+
+		String[] args = argument.split(" ");
+
+		// Go through arguments and add to minerals
+		for (mineral : args) {
+			minerals.add(mineral);		
+		}
+	}
+	showLites();					
+}
+
+void bootup() {
+
+	triggerManager.newTrigger("MineralGetCoordinate",
+		"^You are in \\'(.*) on the continent of ([A-Za-z]*)\\. \\(Coordinates\\: ([0-9]*)x, ([0-9]*)y",
+		"$"+SCRIPT_NAME+".printInfo", true, false, false, null, Font.PLAIN );	
+
+	// Disable whereami trigger as it should be used only when mineral is found
+	clientGUI.doCommand( "/trigdisable MineralGetCoordinate" );
+
+
+    triggerManager.newTrigger("matcherMineral",
+        "(deposit |abyss |lode |graveyard |protrusion |slab |crag |gloss |hill )",
+        "$"+SCRIPT_NAME+".checkMatch", false, false, true, yellow, Font.PLAIN);
+
+}
+

@@ -1,0 +1,69 @@
+SCRIPT_NAME = "kbh_help";
+SCRIPT_DESC = "Show progress index (x/31) and some lites.";
+
+String[] messages = { "not even started", "no hope", "little progress", "will take forever", "needs more practice", "6000X = rememberance", "one fifth soon!", "far far, far away", "one fourth someday", "keep on trying..", "this is sick, hehe", "won't tell you! ;)", "not even halfway", "someday, my friend", "seek the knowledge!", "on the better side", "courage, doing well", "dreams do come true", "1,000,000X and you see it", "Gm's fax: +358 0 577795", "PING! THE magic number!", "still far away", "good progress", "getting there", "warm already", "not so far anymore", "getting hot", "almost there!", "on the verge", "any play now", "SooO CLOSE!", "done" };
+
+static getIndex( kbh_msg ) {
+
+	for( int i = 0; i < messages.length; i++) {
+    	if (kbh_msg.equals( messages[i] ) ) {
+			return i;
+		}
+	}
+}
+
+// Add colors to view if spell is in memory or kbh
+static colorMemory( memory ) {
+	// Red
+	if ( memory.equals("not in memory") ) {
+		return "\033[1m\033[31m" + memory + "\033[0m";
+	// Green
+	} else if ( memory.equals("currently in memory" ) ) {
+		return "\033[1m\033[32m" + memory + "\033[0m";
+	// Magenta
+	} else if ( memory.equals("known by heart" ) ) {
+		return "\033[1m\033[35m" + memory + "\033[0m";
+	}
+}
+
+// Add index number to progress message
+static makeMessage ( msg ) {
+	// Get index of progress message
+	int index = getIndex( msg );	
+
+	// Add tabs to short messages to keep layout straight
+	if ( index == 31 ) {
+		return msg + "\t\t\t  ";
+	} else {
+		// Make index double digit
+		if ( index < 10 ) {
+			return msg + "(0" + index + "/31)\t  ";
+		} else {
+			return msg + "(" + index + "/31)\t  ";
+		}
+	}
+}
+
+public void kbh_parse(){ 
+	String name = vars.get(1) + "\t    ";
+	String memory = colorMemory( vars.get(5) );
+	String progress = makeMessage( vars.get(3) );
+
+	// Print new message
+	clientGUI.printText("general", " " + name + progress + memory + "\n");
+}
+
+void printTitle()  {
+    clientGUI.printText("general", "=[songspell]==============[left from KBH'ing]======[memorization status]===\n");
+}
+
+
+void bootup() {
+    triggerManager.newTrigger("kbh_grabber",
+        "^ (Catchy singalong|Singing shepherd|Rapture of the deep|Musicians alm|Noituloves dischord|Sweet lullaby|Kings feast|Campfire tune|Strength in unity|Venturers way|War ensemble|Uncontrollable mosh|Clandestine thoughts|Vigilant melody|Con fioco|Jesters trivia|Melodical embracement|Sounds of silence|Noituloves deathlore|Achromatic eyes|Dancing blades|Pathfinder|Soothing sounds|Melody of the misadventurer) ([ ]*) (not even started|no hope|little progress|will take forever|needs more practice|6000X = rememberance|one fifth soon!|far far, far away|one fourth someday|keep on trying..|this is sick, hehe|won't tell you! ;\\)|not even halfway|someday, my friend|seek the knowledge!|on the better side|courage, doing well|dreams do come true|1,000,000X and you see it|Gm's fax: +358 0 577795|PING! THE magic number!|still far away|good progress|getting there|warm already|not so far anymore|getting hot|almost there!|on the verge|any play now|SooO CLOSE!|done) ([ ]*) (not in memory|currently in memory|known by heart)$",
+        "$"+SCRIPT_NAME+".kbh_parse",true,false,false,null,Font.PLAIN);
+
+    triggerManager.newTrigger("kbh_headline_grabber",
+        "^=[songspell]=============[left from KBH'ing]=========[memorization status]===$",
+        "$"+SCRIPT_NAME+".printTitle",true,false,false,null,Font.PLAIN);
+}
