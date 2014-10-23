@@ -26,6 +26,9 @@ static colorMemory( memory ) {
 	}
 }
 
+
+
+
 // Add index number to progress message
 static makeMessage ( msg ) {
 	// Get index of progress message
@@ -35,12 +38,18 @@ static makeMessage ( msg ) {
 	if ( index == 31 ) {
 		return msg + "\t\t\t  ";
 	} else {
+/*
 		// Make index double digit
 		if ( index < 10 ) {
-			return msg + "(0" + index + "/31)\t  ";
+			return msg + "(0" + index + "/30)\t  ";
 		} else {
-			return msg + "(" + index + "/31)\t  ";
+			return msg + "(" + index + "/30)\t  ";
 		}
+*/
+		int percentage = (index/30.0)*100.0;
+//		clientGUI.printText("general", "index: " + index + " " + percentage + "\n");
+
+		return msg + "(" + percentage + "%)\t  ";
 	}
 }
 
