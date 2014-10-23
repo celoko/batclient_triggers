@@ -1,3 +1,5 @@
+// Missing lots of stuff
+
 SCRIPT_NAME = "plantlite_all";                                                                                    
 SCRIPT_DESC = "Lite plants";                                                                              
 SCRIPT_OFF = false;
