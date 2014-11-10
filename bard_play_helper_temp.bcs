@@ -1,0 +1,67 @@
+SCRIPT_NAME = "bard_play_helper_temp";
+SCRIPT_DESC = "Script to help deliver bard play";
+// Usage:
+// Make keybinding to $bard_play_helper_temp 
+// For role change, make command cr enter;ne;wear $*;sw;e
+
+int counter = 0;
+
+List lines = new ArrayList();
+// Write commands here
+// Every line is send to mud, so use say or emote, etc.
+// put 'cr name' where you want costume change
+// Turn brief on to minimize movement spam.
+
+// Example play
+//
+// Role change will happen automatically,
+// so with first run it changes role and sends next line to mud
+
+// Change role
+lines.add("cr Narrator");
+// Say line
+lines.add("say Hello and welcome to the show.");
+// Emote
+lines.add("emote moves behind the curtains.");
+
+// Change role
+lines.add("cr clowncar");
+lines.add("emote drives to the stage."); // %Clowncar drives to the stage.
+lines.add("cr bunch");
+// Set role with name Bunch
+// audience will see %Bunch of clowns get out of the car.
+lines.add("emote of clowns get out of the car.");
+lines.add("cr clown1");
+lines.add("say thank god we came with the SUV.");
+
+// END OF STORY
+
+// This is where the magic happens
+//
+doLine() {
+	String line = lines.get(counter);
+
+	// If line starts with cr (= costume change)
+	// run it and next line also
+	// otherwise do just one line
+	if ( line.split(" ")[0].equals("cr") ) {
+		//clientGUI.printText("general", line + "\n" );
+		clientGUI.doCommand( line );
+		counter++;
+		
+		if (counter <= lines.size() ) {
+			doLine();
+		}
+	} else {
+		clientGUI.doCommand( line );
+		counter++;
+	}
+}
+
+void run(){
+    if (counter < lines.size()) {
+		doLine();
+    } else {
+        clientGUI.printText("general", "Bard_play_helper: Play is over\n" );
+    }
+}
