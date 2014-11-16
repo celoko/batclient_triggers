@@ -1,0 +1,95 @@
+SCRIPT_NAME = "bph";
+SCRIPT_DESC = "Script to help deliver bard play";
+// Usage:
+// Make keybinding to $bph
+// Run $bph without agruments to do line
+// $bph goto x to change current line
+
+// For role change, make command cr enter;ne;wear $*;sw;e
+
+int counter = 0;
+
+List lines = new ArrayList();
+
+// Read story to lines array
+void loadStory() {
+
+    file = "secret_of_the_clones_full.txt";
+
+    String result = "";
+    BufferedReader in;
+
+    try{
+        in = new BufferedReader(new FileReader( file ));
+
+        int token = 0;
+
+        while(token >= 0){
+            token = in.read();
+
+            if(token >= 0){
+				// Split on linebreak and write to array
+				if ((char)token == '\n') {
+					lines.add(result);
+					result = "";
+				} else {
+	                result += (char)token;
+				}
+            }
+        }
+        in.close();
+    }catch(Exception e){
+        clientGUI.printText("general", ""+e);
+        return;
+    }
+}
+
+doLine() {
+	String line = lines.get(counter);
+
+	// If line starts with cr (= costume change)
+	// run it and next line also
+	// otherwise do just one line
+	if ( line.split(" ")[0].equals("cr") ) {
+		clientGUI.printText("general", line + "\n" );
+		//clientGUI.doCommand( line );
+		counter++;
+		
+		if (counter <= lines.size() ) {
+			doLine();
+		}
+	} else {
+		clientGUI.printText("general", line + "\n" );
+		//clientGUI.doCommand( line );
+		counter++;
+	}
+}
+
+void run(){
+	//clientGUI.printText("general", "Bard_play_helper: Arg: "+ argument +".\n" );
+
+	if (argument == null || "".equals(argument) || !argument.contains(" ") ) {
+
+    	if (counter < lines.size()) {
+			doLine();
+    	} else {
+        	clientGUI.printText("general", "Bard_play_helper: Play is over\n" );
+    	}
+	} else {
+		String command = argument.split(" ")[0];
+		int newLine = Integer.parseInt(argument.split(" ")[1]);
+ 		if ( "goto".equals(command) ) {
+			if ( (newLine != null) && (newLine <= lines.size()) ) {
+				counter = newLine;
+				clientGUI.printText("general", "Bph: Counter set to: " + counter +".\n" );
+				clientGUI.printText("general", "Bph: Current line: " + lines.get(counter) +".\n" );
+			} else { 
+				clientGUI.printText("general", "Bph: Wrong line.\n" );
+			}
+		}
+	}
+}
+
+void bootup() {
+	loadStory();
+}
