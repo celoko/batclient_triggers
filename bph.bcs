@@ -14,7 +14,8 @@ List lines = new ArrayList();
 // Read story to lines array
 void loadStory() {
 
-    file = "secret_of_the_clones_full.txt";
+	// Change the path!
+    file = "/path/to/story.txt";
 
     String result = "";
     BufferedReader in;
@@ -51,16 +52,16 @@ doLine() {
 	// run it and next line also
 	// otherwise do just one line
 	if ( line.split(" ")[0].equals("cr") ) {
-		clientGUI.printText("general", line + "\n" );
-		//clientGUI.doCommand( line );
+		//clientGUI.printText("general", line + "\n" );
+		clientGUI.doCommand( line );
 		counter++;
 		
 		if (counter <= lines.size() ) {
 			doLine();
 		}
 	} else {
-		clientGUI.printText("general", line + "\n" );
-		//clientGUI.doCommand( line );
+		//clientGUI.printText("general", line + "\n" );
+		clientGUI.doCommand( line );
 		counter++;
 	}
 }
