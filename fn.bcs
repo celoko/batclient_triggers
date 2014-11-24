@@ -1,0 +1,75 @@
+SCRIPT_NAME = "fn";
+SCRIPT_DESC = "Show item number in forge";
+// Sort the forge first
+
+
+String old_mat = "";
+String output = "";
+int x  = 1;
+
+void enableCount()	{
+	clientGUI.doCommand("/trigenable fn_count_mat");
+
+	old_mat = "";
+	x = 1;
+}
+
+void disableCount()	{
+	clientGUI.doCommand("/trigdisable fn_count_mat");
+}
+
+void count()	{
+
+output = "";
+
+String space = vars.get(3);
+
+int[] arr = {1,4}; 
+
+for(int y: arr ){
+	String s = vars.get(y);
+	if ( s != null ) {
+		if ( old_mat.equals("") || !s.equals(old_mat) ) {
+			x = 1;
+			output += s +" "+ x +" "+ vars.get(y+1);
+		} else if ( s.equals(old_mat) ) {
+			output += s +" "+ x +" "+ vars.get(y+1);
+		} 
+	x++;
+	
+	// Add spaces to keep second column straight
+	if (x < 10 ) { 
+		space += "  ";
+	} else if (x < 100 ) { 
+		space += " ";
+	}
+	
+	// Add space after first material
+	if (y == 1) { output += space; }
+	old_mat = s;
+	}
+}
+	clientGUI.printText("general", " " + output +"\n");
+}
+
+void bootup() {
+  triggerManager.newTrigger("fn_count_mat",
+    "^ ([a-z]+[ ]{0,1}[a-z]+) (\\[[^]]+\\])([ ]+)?([a-z]+[ ]{0,1}[a-z]+)? ?(\\[[^]]+\\])?[ ]+$",
+    "$"+SCRIPT_NAME+".count", true, false, false,
+    null, Font.PLAIN);
+
+// disable by default
+clientGUI.doCommand("/trigdisable fn_count_mat");
+
+  triggerManager.newTrigger("fn_begin_forge",
+    "^There are ([1-9]+) minerals in it:$",
+    "$"+SCRIPT_NAME+".enableCount", false, false, false,
+    null, Font.PLAIN);
+
+// Amateur/pro/master forges are all extremely heavy?
+  triggerManager.newTrigger("fn_end_forge",
+    "^It looks EXTREMELY heavy.$",
+    "$"+SCRIPT_NAME+".disableCount", false, false, false,
+    null, Font.PLAIN);
+}
+
