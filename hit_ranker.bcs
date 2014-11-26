@@ -1,0 +1,97 @@
+SCRIPT_NAME = "hit_ranker";
+SCRIPT_DESC = "Ranks hits done by you, x out of 26.  ex (5/26) at end of damage message.";
+SCRIPT_OFF = false;
+
+// Original idea by hair 
+
+String hit 	= "";
+int index	= 0;
+int max 	= 0;
+
+// Ansi color codes
+String colB = "\033[1m\033[32m"; 	// green
+String colA = "\033[0m"; 			// clears all color
+
+// Hit messages for all types 
+String[] bash = { "lightly jostle", "jostle", "butt", "bump", "thump", "stroke", "thrust", "jab", "bash", "strike", "sock", "cuff", "knock", "flail", "whack", "beat", "smash", "cruelly beat", "badly smash", "horribly thrust", "savagely sock", "savagely strike", "REALLY WHACK", "BRUTALLY BEAT", "CRUELLY CUFF", "BARBARICALLY BASH"};
+String[] pierce = { "barely scratch", "scratch", "slightly pierce", "pierce", "puncture", "sink", "bore", "crater", "cavitate", "shaft", "gorge", "really poke", "riddle", "dig into", "dig through", "chasm", "drill", "powerfully perforate", "powerfully pierce", "cruelly crater", "savagely shaft", "uncontrollably dig through", "REALLY DRILL", "CRUELLY RIDDLE ", "BRUTALLY BORE", "BARBARICALLY PIERCE" };
+String[] slash = { "barely graze", "solidly slash", "gash", "lightly cut", "cut", "tear", "incise", "shred", "horribly shred", "slash", "incisively cut", "incisively tear", "slit", "cruelly tatter", "savagely shave", "rive", "cruelly slash", "uncontrollably slash", "quickly cut", "savagely rip", "BRUTALLY TEAR", "SAVAGELY SHRED", "CRUELLY REND", "BARBARICALLY BEAT", "DISMEMBER", "CRUELLY DISMEMBER"};
+String[] shield = { "lightly shove", "lightly batter", "lightly push", "lightly bash", "lightly slam", "lightly crush", "heavily shove", "batter", "heavily push", "heavily bash", "slam", "crush", "really shove", "really batter", "really push", "really bash", "really slam", "really crush", "cruelly shove", "cruelly batter", "cruelly push", "cruelly bash", "REALLY SLAM", "REALLY CRUSH", "BRUTALLY CRUSH", "BARBARICALLY SLAM" };
+String[] whip = { "lash", "lightly lash ", "lightly flog", "slightly slash", "flog", "slice", "sharply slice ", "lightly flick ", "flick", "whip", "wantonly whip", "welt", "lightly blister", "blister", "badly flog", "slightly gash ", "savagely cut", "sharply cut ", "thrash", "cruelly thrash", "slightly slit ", "strap", "lather", "SADISTICALLY SLASH", "MADLY THRASH ", "WILDLY WHIP" };
+String[] unarmed = {"pat", "spank", "smack", "bitchslap", "lightly strike", "boot", "kick", "suckerpunch", "ankle-stomp", "stomp", "knee-kick", "badly kick", "jump-kick", "uppercut", "kidneypunch", "spin-kick", "headbutt", "cruelly headbutt", "dragon-punch", "savagely triple-kick", "roundhouse", "bodyslam", "run into", "REALLY SMASH", "BRUTALLY BOOT", "BARBARICALLY BEAT"};
+String[] mtiger = { "tickle", "step on", "grasp", "toe-kick", "knee", "elbow", "elbow-smash", "stomp-kick", "foot-step", "twist and throw", "finger-jab", "joint-twist", "back kick", "spinning back kick", "phoenix-eye punch", "spinning backfist", "jump up and side-kick", "dragon-claw", "feint high and then cruelly groin-rip", "snake-strike, blocking the chi of", "pummel, with dozens of chain punches,", "leap, spin, and swallow-tail KICK", "DEVASTATE, with a thrusting blow,", "BRUTALLY THROAT RIP", "SAVAGELY BELLY SMASH", "CRUELLY TIGER STRIKE" };
+String[] mmonk = { "slap", "push", "shove", "grab", "punch", "foot-sweep", "evade, and then reverse", "grab and shoulder-toss", "snap-kick", "joint-lock", "unbalance, then expertly throw", "stop-kick", "reverse spin-kick", "pull, then cruelly throat chop", "trip and head-stomp", "savagely hammerfist", "craftily feint and then grab and flip", "fluidly evade, duck under and spine-chop", "nerve-grab, causing unendurable pain to", "perform a lightning fast punch and throw combo on", "grab, headbutt, then NECK-SNAP", "masterfully evade then JUMP-KICK", "DEVASTATINGLY HEAD-THROW", "HORRIBLY DOUBLE-KICK", "MASTERFULLY POWER-THROW", "DEVASTATINGLY SNAP-KICK" };
+String[] bite = { "sample", "morsel", "nibble", "taste", "bite", "nip", "really taste", "snap", "munch", "chomp", "gnaw", "split", "masticate", "badly chomp", "chew", "rip", "cruelly gnaw", "cruelly chomp", "savagely snap", "brutally bite", "meanly munch", "really chew", "horribly munch", "SAVAGELY CHEW", "UNCONTROLLABLY GNAW", "BARBARICALLY BITE" };
+String[] claw = { "lightly claw", "claw", "barely scrape", "scrape", "prick", "stick", "lacerate", "perforate", "badly perforate", "wound", "badly wound", "savagely claw", "cruelly perforate", "plunge", "lightly eviscerate", "ram", "clash", "savagely strike", "eviscerate", "cruelly rip", "nastily plunge", "cruelly ram", "WHACK", "RELENTLESSLY RAM", "CRUELLY CLAW", "BARBARICALLY LACERATE" };
+String[] breath = { "breath lightly", "breath", "snort", "snort lightly", "sneeze", "sneeze softly", "cough", "gasp", "gasp loudly", "vomit", "vomit profusely", "choke", "exhale", "exhale quickly", "blow", "burp", "burp loudly", "hiccough", "hiccough rapidly", "sigh", "sigh heavily", "yawn", "yawn widely", "BREATH HARD", "SNORT SAVAGELY", "VICIOUSLY VOMIT" };
+
+void rankHit() {
+	hit=vars.get(2);
+	String rank = "";
+	
+	if ( argument.equals("bash") ) 			{ rank = getRank( bash ); }
+	else if ( argument.equals("pierce") ) 	{ rank = getRank( pierce ); }
+	else if ( argument.equals("slash") ) 	{ rank = getRank( slash ); }
+	else if ( argument.equals("shield") ) 	{ rank = getRank( shield ); }
+	else if ( argument.equals("whip") ) 	{ rank = getRank( whip ); }
+	else if ( argument.equals("unarmed") ) 	{ rank = getRank( unarmed ); }
+	else if ( argument.equals("mtiger") ) 	{ rank = getRank( mtiger ); }
+	else if ( argument.equals("mmonk") ) 	{ rank = getRank( mmonk ); }
+	else if ( argument.equals("bite") ) 	{ rank = getRank( bite ); }
+	else if ( argument.equals("claw") ) 	{ rank = getRank( claw ); }
+	else if ( argument.equals("breath") ) 	{ rank = getRank( breath ); }
+
+	// Remove linebreaks
+	String fullmess = vars.get(0).replaceAll("[\n\r]", "");
+	
+	clientGUI.printText("general", fullmess + " "+ colB + rank + colA + "\n");
+}
+
+
+// returns index and max
+String getRank(String[] array) {
+
+	index = 0;
+    max = array.length;
+
+    for (x=0;x<max;x++) {
+    	if ( array[x].equals(hit) ) { index = x; }
+    }
+
+	return "(" + index + "/" + max + ")";
+}
+
+
+// Builds trigger body that matches hit messages
+public void makeBody(String[] array, String type) {
+
+	String body = "(^Smiling demonically you|^Cackling demonically you|^You) (";
+
+	for (String hit : array) {
+    	body += hit + "|";
+	}
+	body += ") ([a-zA-Z, ]*).$";
+
+	//clientGUI.printText("general", type +": " + body + "\n");
+
+    triggerManager.newTrigger("dr_trig"+type+"",
+		""+body+"",
+        "$"+SCRIPT_NAME+".rankHit "+type+"",true,false,false,null,Font.PLAIN);
+}
+
+void bootup() {
+	// enable/disable types here
+	
+	makeBody(bash, 		"bash");
+	makeBody(pierce, 	"pierce");
+	makeBody(slash, 	"slash");
+	//makeBody(shield, 	"shield");
+	//makeBody(whip, 		"whip");
+	makeBody(unarmed, 	"unarmed");
+	//makeBody(mtiger, 	"mtiger");
+	//makeBody(mmonk, 	"mmonk");
+	//makeBody(bite, 		"bite");
+	//makeBody(claw, 		"claw");
+	//makeBody(breath, 	"breath");
+}
+
