@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 yellow = new Color[]{new Color(255,255,0)};
 
 boolean bell = false;
+boolean enabled = true;
 //boolean checkCoords = false;
 
 String result = "";
@@ -61,6 +62,12 @@ void getLocation(){
 
 void showLites() {
 
+	if (enabled == true ) {
+		clientGUI.printText("general", "Script enabled.\n", "#FFFF00");
+	} else {
+		clientGUI.printText("general", "Script disabled.\n", "#FFFF00");
+	}
+
 	if (bell == true ) {
 		clientGUI.printText("general", "Bell: on\n", "#FFFF00");
 	} else {
@@ -90,13 +97,27 @@ void printInfo() {
 
 }
 
+void turnOff() {
+	clientGUI.doCommand( "/trigdisable matcherMineral" );
+	enabled = false;
+}
+
+void turnOn() {
+	clientGUI.doCommand( "/trigenable matcherMineral" );
+	enabled = true;
+}
 
 void run(){
 
 	// When no argument, lite all minerals
   	if (argument == null || ("".equals(argument)) ) {
 		argument = "all";
+		turnOn();
 	} else if ( argument.equals("show") ) {
+	} else if ( argument.equals("off") ) {
+		turnOff();
+	} else if ( argument.equals("on") ) {
+		turnOn();
 	} else if (argument.equals("bell") ) {
 		if ( bell == false ) { 
 			bell = true; 
@@ -111,7 +132,8 @@ void run(){
 		// Go through arguments and add to minerals
 		for (mineral : args) {
 			minerals.add(mineral);		
-		}
+		}		
+		turnOn();
 	}
 	showLites();					
 }
@@ -124,7 +146,6 @@ void bootup() {
 
 	// Disable whereami trigger as it should be used only when mineral is found
 	clientGUI.doCommand( "/trigdisable MineralGetCoordinate" );
-
 
     triggerManager.newTrigger("matcherMineral",
         "(deposit |abyss |lode |graveyard |protrusion |slab |crag |gloss |hill )",
