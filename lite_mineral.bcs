@@ -1,4 +1,5 @@
 // Usage: '$lite_mineral all' to lite all minerals
+// 		  '$lite_mineral on/off to enable or disable script
 // 		  '$lite_mineral show' to show selected minerals
 // 		  '$lite_mineral ruby diamond basalt' to set minerals
 //		  '$lite_mineral bell' tp toggle bell 
