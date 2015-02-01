@@ -19,3 +19,9 @@ taming.bcs - Shows success/fails etc. when taming animals. Helps figuring out ho
 
 
 
+How to install scripts
+======================
+Save file to batclient/scripts directory and restart client or do /scriptreload and /scriptbootup
+
+
+
