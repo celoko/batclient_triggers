@@ -1,5 +1,10 @@
+
 batclient_triggers
 ==================
+Most of these triggers are in barely working condition, they work for me, but there has been some problems atleast with entity_rep_counter and hit_ranker, maybe they interfere with some other triggers or maybe its bug, dunno.
+
+It would be best if you knew enough about scripting to fix the errors and modify the trigs for your needs.
+
 
 bm.bcs - Beastmaster, shows when ride underground/through xx was last used and some lites etc.
 
