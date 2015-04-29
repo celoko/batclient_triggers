@@ -1,0 +1,79 @@
+SCRIPT_NAME = "pl";
+SCRIPT_DESC = "Puts pirate ship names to aliases";
+
+// Reads npc pirate boat names from ship scan
+// and creates aliases: alias cX shipname
+//
+// Modify commands in makeAlias function
+//
+// $pl.clear to clear names
+
+
+List names = new ArrayList();
+int shipnr = 1;
+
+void addName() {
+
+    // Curath's Hand {curathshand2} (pirate schooner)
+    // pirate = curathshand2
+    String pirate = vars.get(2);
+
+    if ( !names.contains(pirate) ) {
+        names.add(pirate);
+        makeAlias(pirate);
+        shipnr++;
+    }
+    //clientGUI.printText("general", "Triggered!\n");
+}
+
+void makeAlias(String name) {
+
+    // Clientside alias
+    // /alias c1=emote ship pursue Name
+    //clientGUI.doCommand("/alias c" + shipnr + "=emote ship pursue " + name);    
+    //clientGUI.printText("general", "/alias c" + shipnr + "=emote ship pursue " + name + "\n");
+     
+    // Ingame command
+    // command c1 emote ship pursue Name
+    //clientGUI.doCommand("command c" + shipnr + " emote ship pursue " + name);    
+
+    // Ingame alias
+    // alias c1 Name
+    clientGUI.doCommand("alias c" + shipnr + " " + name);    
+
+}
+
+void clear() {
+    shipnr = 1;
+    names.clear();
+    clientGUI.printText("general", "Pirate ship names cleared.\n");
+}
+void enable() {
+    //clientGUI.printText("general", "Enabled!\n");
+    clientGUI.doCommand("/trigenable pl_get_name");    
+}
+
+void disable() {
+    clientGUI.doCommand("/trigdisable pl_get_name");    
+}
+
+void bootup() {
+	triggerManager.newTrigger("pl_get_name",
+		//"^[ ]{2}([A-Za-z' ]+)[ ]\\(pirate [a-z]+\\)[ ]\\(shielded\\)$",           // TEST
+		"^[ ]{2}([A-Za-z' ]+)\\{([a-z0-9]+)[ ]?(<aggressive>)?\\}[ ]\\(pirate [a-z]+\\)$",
+		"$"+SCRIPT_NAME+".addName",false,false,false,null,Font.PLAIN);
+
+// Disable trigger by default
+disable();
+
+// Enable trigger when ship scan is used
+	triggerManager.newTrigger("pl_enable",
+		"(^The following image forms in your mind:$|^However, the following ships were detected in this room:$)",
+		"$"+SCRIPT_NAME+".enable",false,false,false,null,Font.PLAIN);
+
+// Disable
+	triggerManager.newTrigger("pl_disable",
+		"^You feel mentally and physically drained.$",
+		"$"+SCRIPT_NAME+".disable",false,false,false,null,Font.PLAIN);
+}
+
