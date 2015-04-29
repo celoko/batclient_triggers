@@ -20,6 +20,8 @@ kbh_help.bcs - Shows percentages in kbh messages with some lites, bit buggy.
 
 lite_mineral.bcs - Lites multiple minerals and helps to notice deposits.
 
+pl.bcs - Gets npc pirate ship names from ship scan and puts them to aliases.
+
 taming.bcs - Shows success/fails etc. when taming animals. Helps figuring out how well you are doing.
 
 
