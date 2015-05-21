@@ -1,0 +1,142 @@
+SCRIPT_NAME = "mh";
+SCRIPT_DESC = "Mount heel handler";
+
+// Reads and stores heel messages 
+// Usage:
+//
+// Add heel message manually:
+// $mh a use heel at Fierce griffon 3
+//
+// Show stored heel messages
+// $mh l
+//
+// Heel mount
+// $mh c <number>
+//
+// Delete entry
+// $mh d <number>
+//
+// Clear list
+// $mh clr
+//
+// Put messages to note, so that you don't lose
+// messages if client crashes. 
+// $mh.tonote
+
+// Trigger fails sometimes, because heel message has
+// whitespace/tab/something, but it's quite rare
+
+import java.util.TreeMap;
+import java.util.Iterator;
+import java.util.Map;
+
+TreeMap mounts = new TreeMap();
+
+String command = "";
+
+void add() {
+    if (command == "") {
+        // Make heel command from name and number
+        command = "use heel at " + vars.get(1) + " " + vars.get(2);
+    }
+
+    if ( !mounts.containsValue(command) ) {
+        int index = 0;
+        if ( mounts.lastEntry() != null ) {
+            index = mounts.lastKey() + 1;   // Get highest key + 1
+        }
+        mounts.put(index, command);
+        clientGUI.printText("general", "Heel added to slot: " + index + "\n");
+    }
+}
+
+void clear() {
+    mounts = new TreeMap();
+    clientGUI.printText("general", "Heel list is cleared.\n");
+}
+
+void show() {
+    clientGUI.printText("general", "\n.-( Heel list )---------\n");
+    for (Map.Entry entry : mounts.entrySet()) {
+    //for (int key : mounts.keySet()) {
+        int key = entry.getKey();
+        String value = entry.getValue();  
+        clientGUI.printText("general", "| " + key + ": " + value + "\n");
+    }
+    clientGUI.printText("general", "'-----------------------\n\n");
+}
+
+// use heel
+void call(int key) {
+    
+    if ( mounts.containsKey(key) ) {
+        clientGUI.printText("general", "Heel: " + key + ": "+ mounts.get(key) + "\n");
+        clientGUI.doCommand(mounts.get(key));
+    } else { 
+        clientGUI.printText("general", "Can't call, wrong key: " + key + "\n");
+    }
+}
+
+// delete from list
+void del(int key) {
+    
+    if ( mounts.containsKey(key) ) {
+        clientGUI.printText("general", "Deleting: " + key + ": "+ mounts.get(key) + "\n");
+        mounts.remove(key);
+    } else { 
+        clientGUI.printText("general", "Can't delete, wrong key: " + key + "\n");
+    }
+}
+
+// Put heel commands to note
+void tonote() {
+     for (Map.Entry entry : mounts.entrySet()) {
+        String value = entry.getValue();  
+        clientGUI.doCommand("@@note " + value); 
+    }
+}
+
+void run() {
+
+    command = "";
+
+    if (argument == null || "".equals(argument) ) {
+        return;
+    } else {
+
+        String[] args = argument.split(" ");
+        
+        if (args[0] == null) { args[0] = argument; }
+        
+        // Add new heel message
+        if (args[0].equals("a")) {
+            command = argument.substring(2, argument.length());     // Get rest of the command
+            add();
+        // Call mount
+        } else if (args[0].equals("c")) {
+            if ( args[1].matches("\\d+") ) {    // Check that we have number
+                int command = Integer.parseInt(args[1]); 
+                call(command);
+            }
+        // Delete entry
+        } else if (args[0].equals("d")) {
+            if ( args[1].matches("\\d+") ) {
+                int command = Integer.parseInt(args[1]); 
+                del(command);
+            }
+        // Show list
+        } else if (args[0].equals("l")) {
+            show();
+        // Clear list
+        } else if (args[0].equals("clr")) {
+            clear();
+        }
+    }
+}
+
+void bootup() {
+	triggerManager.newTrigger("mh_heel_grab_alt",
+		"^[A-Za-z- ]+ seems to perk up. It will now respond to:[\\s\\n\\t\\f]+use heel at ([A-Za-z- ]+) ([0-9]+)[\\s\\n\\t\\f]+$",
+		"$"+SCRIPT_NAME+".add",false,false,false,null,Font.PLAIN);
+}
+
