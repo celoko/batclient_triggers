@@ -43,7 +43,7 @@ void bootup(){
     false, true, false, new Color[]{lure_hit}, Font.PLAIN);
  
   triggerManager.newTrigger("lure_04_stun",
-    "^You go \\'GOTCHA!\\'",
+    "You go 'GOTCHA!' and strike your weapon into her skull putting her central nerve system out of order.$",
     "$"+SCRIPT_NAME+".lured 4",
     false, true, false, new Color[]{lure_hit}, Font.PLAIN);
 
@@ -53,7 +53,7 @@ void bootup(){
     false, true, false, new Color[]{lure_hit}, Font.PLAIN);
 
   triggerManager.newTrigger("lure_break",
-    "^But ([A-Za-z-]*)\\'s extreme knowledge in stunned maneuvers",
+    "^But ([A-Za-z-]*)'s extreme knowledge in stunned maneuvers",
     "$"+SCRIPT_NAME+".lure_break", 
     false, true, false, new Color[]{lure_fail}, Font.PLAIN);
 
