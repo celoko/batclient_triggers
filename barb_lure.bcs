@@ -1,0 +1,74 @@
+SCRIPT_NAME="barb_lure";
+SCRIPT_DESC = "Reports lure messages to party report channel.";
+SCRIPT_OFF = false;
+
+/* Converted from Hair's script
+ * http://flaprider.dyndns.org/~hair/batmud/barbarian/index.html
+ */
+
+Color lure_hit = new Color(0, 127, 0);
+Color lure_fail = new Color(127, 0, 0);
+
+void lured(){
+    rounds = argument;
+	clientGUI.doCommand("party report "+rounds+" round lure");
+}
+
+void lure_fail(){
+	clientGUI.doCommand("party report Lure failed!");
+}
+
+void lure_break(){
+	clientGUI.doCommand("party report Damn, monster maneuvered lure!");
+}
+
+void lure_ignore(){
+	clientGUI.doCommand("party report  Lure ignored!");
+}
+
+void bootup(){
+  triggerManager.newTrigger("lure_01_stun",
+    "^You have trouble but manage to",
+    "$"+SCRIPT_NAME+".lured 1", 
+    false, true, false, new Color[]{lure_hit}, Font.PLAIN);
+
+  triggerManager.newTrigger("lure_02_stun",
+    "^You valiantly strike back at",
+    "$"+SCRIPT_NAME+".lured 2",
+    false, true, false, new Color[]{lure_hit}, Font.PLAIN);
+ 
+  triggerManager.newTrigger("lure_03_stun",
+    "^You see opportunity and butt the shaft",
+    "$"+SCRIPT_NAME+".lured 3",
+    false, true, false, new Color[]{lure_hit}, Font.PLAIN);
+ 
+  triggerManager.newTrigger("lure_04_stun",
+    "^You go \\'GOTCHA!\\'",
+    "$"+SCRIPT_NAME+".lured 4",
+    false, true, false, new Color[]{lure_hit}, Font.PLAIN);
+
+  triggerManager.newTrigger("lure_05_stun",
+    "^And brutally shove your weapon down",
+    "$"+SCRIPT_NAME+".lured 5",
+    false, true, false, new Color[]{lure_hit}, Font.PLAIN);
+
+  triggerManager.newTrigger("lure_break",
+    "^But ([A-Za-z-]*)\\'s extreme knowledge in stunned maneuvers",
+    "$"+SCRIPT_NAME+".lure_break", 
+    false, true, false, new Color[]{lure_fail}, Font.PLAIN);
+
+  triggerManager.newTrigger("lure_fail",
+    "^You fail to make any use of your opportunity!$",
+    "$"+SCRIPT_NAME+".lure_fail",
+    false, true, false, new Color[]{lure_fail}, Font.PLAIN);
+
+  triggerManager.newTrigger("lure_fail2",
+    "^...but you fail to outwit your enemy, which ([A-Za-z-]*) notices!$",
+    "$"+SCRIPT_NAME+".lure_fail",
+    false, true, false, new Color[]{lure_fail}, Font.PLAIN);
+
+  triggerManager.newTrigger("lure_ignore",
+    "^([A-Za-z-]*) ignores your lure.$",
+    "$"+SCRIPT_NAME+".lure_ignore",
+    false, true, false, new Color[]{lure_fail}, Font.PLAIN);
+}
