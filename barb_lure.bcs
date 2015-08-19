@@ -9,9 +9,23 @@ SCRIPT_OFF = false;
 Color lure_hit = new Color(0, 127, 0);
 Color lure_fail = new Color(127, 0, 0);
 
+extra_round = 0;
+
 void lured(){
-    rounds = argument;
-	clientGUI.doCommand("party report "+rounds+" round lure");
+    rounds = Integer.parseInt(argument);
+
+    if (rounds == 5) {
+        extra_round = 1; 
+    } else if (rounds == 4 && extra_round == 1) {
+        report(5);
+        extra_round = 0;
+    } else {
+        report(rounds);
+    }
+}
+
+void report(int rounds){
+    clientGUI.doCommand("party report "+rounds+" round lure");
 }
 
 void lure_fail(){
@@ -43,12 +57,13 @@ void bootup(){
     false, true, false, new Color[]{lure_hit}, Font.PLAIN);
  
   triggerManager.newTrigger("lure_04_stun",
+    /* no ^ in front */
     "You go 'GOTCHA!' and strike your weapon into (its|his|her) skull putting (its|his|her) central nerve system out of order.$",
     "$"+SCRIPT_NAME+".lured 4",
     false, true, false, new Color[]{lure_hit}, Font.PLAIN);
 
   triggerManager.newTrigger("lure_05_stun",
-    "^And brutally shove your weapon down",
+    "^..And brutally shove your weapon down (its|his|her) throat.$",
     "$"+SCRIPT_NAME+".lured 5",
     false, true, false, new Color[]{lure_hit}, Font.PLAIN);
 
