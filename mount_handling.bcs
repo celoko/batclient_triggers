@@ -1,0 +1,54 @@
+SCRIPT_NAME = "mount_handling";
+SCRIPT_DESC = "Dismount etc. handling";
+
+// Ver 1.0
+// Erygon 2015
+
+// Set channel e.g. "@@party say"
+String output = "@@party report";
+
+public void dismounted(){
+	// Inform party
+	clientGUI.doCommand( output+" Dismounted!" );
+	// Lead mount, you should use: alias mymount mount_name
+	clientGUI.doCommand( "@@lead mymount" );
+}
+
+public void offmount(){
+    // Inform rider
+    clientGUI.printText("general", "YOU ARE OFF YOUR MOUNT!\n");
+}
+
+public void scanMount(){
+    clientGUI.doCommand( "@@scan mymount" );
+}
+
+void bootup(){
+	// Dismount messages
+	triggerManager.newTrigger("bm_dismount1",
+		"^You are knocked off your mount!$",
+		"$"+SCRIPT_NAME+".dismounted", false, false, false,
+		null, Font.PLAIN);	
+		
+    triggerManager.newTrigger("bm_dismount2",
+        "^Your annoyed mount throws you!$",
+        "$"+SCRIPT_NAME+".dismounted", false, false, false,
+        null, Font.PLAIN);
+
+    triggerManager.newTrigger("bm_dismount3",
+        "^Your mount throws you!$",
+        "$"+SCRIPT_NAME+".dismounted", false, false, false,
+        null, Font.PLAIN);
+
+    triggerManager.newTrigger("bm_offmountLite",
+        "^You are now off your mount.$",
+        "$"+SCRIPT_NAME+".offmount", false,true,false,new Color[]{new Color(255,0,51)}, Font.PLAIN);
+
+    // Scan mount every 10 rounds, just in case..
+    triggerManager.newTrigger("bm_scan_mount",
+        "Round [0-9]0",
+        "$"+SCRIPT_NAME+".scanMount", false, false, false,
+        null, Font.PLAIN);
+}
+
+
