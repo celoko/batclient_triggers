@@ -1,11 +1,15 @@
 SCRIPT_NAME = "mount_handling";
 SCRIPT_DESC = "Dismount etc. handling";
 
-// Ver 1.0
+// Ver 1.1
 // Erygon 2015
 
 // Set channel e.g. "@@party say"
 String output = "@@party report";
+
+// Dismount color (red)
+Color failcol = new Color(127, 0, 0);
+
 
 public void dismounted(){
 	// Inform party
@@ -27,18 +31,18 @@ void bootup(){
 	// Dismount messages
 	triggerManager.newTrigger("bm_dismount1",
 		"^You are knocked off your mount!$",
-		"$"+SCRIPT_NAME+".dismounted", false, false, false,
-		null, Font.PLAIN);	
+		"$"+SCRIPT_NAME+".dismounted", false, true, false,
+		new Color[]{failcol}, Font.PLAIN);	
 		
     triggerManager.newTrigger("bm_dismount2",
         "^Your annoyed mount throws you!$",
-        "$"+SCRIPT_NAME+".dismounted", false, false, false,
-        null, Font.PLAIN);
+        "$"+SCRIPT_NAME+".dismounted", false, true, false,
+        new Color[]{failcol}, Font.PLAIN);
 
     triggerManager.newTrigger("bm_dismount3",
         "^Your mount throws you!$",
-        "$"+SCRIPT_NAME+".dismounted", false, false, false,
-        null, Font.PLAIN);
+        "$"+SCRIPT_NAME+".dismounted", false, true, false,
+        new Color[]{failcol}, Font.PLAIN);
 
     triggerManager.newTrigger("bm_offmountLite",
         "^You are now off your mount.$",
