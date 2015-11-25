@@ -2,11 +2,15 @@ SCRIPT_NAME = "entity_rep_counter";
 SCRIPT_DESC = "Shows entity rep in numbers";
 SCRIPT_OFF = false;
 
+// Ver 1.1
 // Modified from Hair's barbarian rep counter
 // Not tested with magic entity
 // probably broken if you have >10000 rep
+// Removed next level info stuff
+// Added line that shows entity size/adjective in numbers 
 //
 // Erygon 2014
+
 
 
 // Entity names, change to match your own entities
@@ -20,24 +24,20 @@ String entity_type   = "";
 String entity_humour = ""; 
 
 // Ansi color codes, "\033[0m" clears all color
-String colB = "";
-String colA = "\033[0m";		
+String colB = "";           // Color before
+String colA = "\033[0m";	// Color after	
 
 // Level names
 String[] entity_levels = { "tiny", "titchy", "miniscule", "small", "medium", "large", "huge", "enormous", "humoungous", "garantuan" };
-// Level costs
-// Fire and air might be correct, but other costs are just placeholders
-// http://batwiki.wx.fi/wiki/Rift_entity_reputation
-int[] fire_level_cost =  {0,	25,	220,	680,	1600, 	3125,	 5400,	8570,	10000,	25030 };
-int[] air_level_cost =   {0,	25,	220,	810,	1920, 	3750,	 6480,	8570,	10000,	25030 };
-int[] water_level_cost = {0,	50,	220,	1350,	3200,	3125,	 5400,	8570,	10000,	25030 };
-int[] earth_level_cost = {0,	25,	220,	1980,	4480,	3125,	15125,	8570,	10000,	25030 };
-int[] magic_level_cost = {0,	25,	220,	1980,	4480,	3125,	15125,	8570,	10000,	25030 };
 
 void bootup() {
 	triggerManager.newTrigger("entity_rep_grabber",
 		"^\\| (Fire|Aodh|Air|Water|Earth) ([ ]*) \\| ([o]*)([!]*)([:]*)([,]*)([.]*) \\| (Pleased|Narked ) \\|$",
 		"$"+SCRIPT_NAME+".entity_rep_grabber",true,false,false,null,Font.PLAIN);
+
+	triggerManager.newTrigger("entity_level_grabber",
+		"^\\| ([A-Za-z ]+, a|A) (tiny|titchy|miniscule|small|medium|large|huge|enormous|humongous) (fire|air|water|earth|magic) entity (glowing|shimmering|gleaming|sizzling|sparkling|glittering|radiating|throbbing|pulsating|blazing)",
+		"$"+SCRIPT_NAME+".entity_level_grabber",false,false,false,null,Font.PLAIN);
 
 	// Gag title line and print another
 	triggerManager.newTrigger("entity_rep_title_grabber",
@@ -63,43 +63,64 @@ public void entity_dead(){ clientGUI.printText("general", "--- ENTITY IS DEAD! -
 
 // Your entity has trouble understanding you.
 
-// returns cost of next level
-// also sets color of the type
-static entity_level_check(String type,int rep_amount) {
+// Returns entity color code
+static get_color(String type) {
 	// Type or name
 	if ( type.equals("Fire") || type.equals( fire_name ) ) {
-		colB = "\033[1m\033[31m";
-		return getNextCost(rep_amount, fire_level_cost);
+		return "\033[1m\033[31m";
 	}
 	else if ( type.equals("Air") || type.equals( air_name ) ) {
-		colB = "\033[1m\033[36m";
-		return getNextCost(rep_amount, air_level_cost);
+		return "\033[1m\033[36m";
 	}
 	else if ( type.equals("Water") || type.equals( water_name ) ) {
-		colB = "\033[1m\033[34m";
-		return getNextCost(rep_amount, water_level_cost);
+		return "\033[1m\033[34m";
 	}
 	else if ( type.equals("Earth") || type.equals( earth_name ) ) {
-		colB = "\033[1m\033[33m";
-		return getNextCost(rep_amount, earth_level_cost);
+		return "\033[1m\033[33m";
 	}
 	else if ( type.equals("Magic") || type.equals( magic_name ) ) {
-		colB = "\033[1m\033[35m";
-		return getNextCost(rep_amount, magic_level_cost);
+		return "\033[1m\033[35m";
 	}
 	{ return 0; }
 }
 
-static getNextCost(int rep_amount, int[] costs){
-	for (int i=0;i < costs.length; i++ ) {
-		if ( rep_amount < costs[i] ) { 
-			return costs[i];                                                         
-		}
-	}
+void printTitle()  {
+	clientGUI.printText("general", "| Entity \t  | Power \t | \t\t\t\t   | Humour  |\n");
 }
 
-void printTitle()  {
-	clientGUI.printText("general", "| Entity \t  | Power \t | Next \t\t\t\t   | Humour  |\n");
+// Turns entity type and adjective into numbers
+// and prints them
+void entity_level_grabber() {
+
+    String size = vars.get(2);
+    String adj = vars.get(4);
+    size_num = 0;
+    adj_num = 0;
+
+    if (size.equals("tiny"))        { size_num = 1;}
+    if (size.equals("titchy"))      { size_num = 2;}
+    if (size.equals("miniscule"))   { size_num = 3;}
+    if (size.equals("small"))       { size_num = 4;}
+    if (size.equals("medium"))      { size_num = 5;}
+    if (size.equals("large"))       { size_num = 6;}
+    if (size.equals("huge"))        { size_num = 7;}
+    if (size.equals("enormous"))    { size_num = 8;}
+    if (size.equals("humongous"))   { size_num = 9;}
+// Garantuan is different
+
+    if (adj.equals("glowing"))      { adj_num = 1;}
+    if (adj.equals("shimmering"))   { adj_num = 2;}
+    if (adj.equals("gleaming"))     { adj_num = 3;}
+    if (adj.equals("sizzling"))     { adj_num = 4;}
+    if (adj.equals("sparkling"))    { adj_num = 5;}
+    if (adj.equals("glittering"))   { adj_num = 6;}
+    if (adj.equals("radiating"))    { adj_num = 7;}
+    if (adj.equals("throbbing"))    { adj_num = 8;}
+    if (adj.equals("pulsating"))    { adj_num = 9;}
+    if (adj.equals("blazing"))      { adj_num = 10;}
+
+    clientGUI.printText("general", "| " + size + "(" +size_num + ")\t " + adj + "(" + adj_num +") |\n");
+    clientGUI.printText("general", "|--------------------------------------------------------------------------|\n");
 }
 
 void entity_rep_grabber()  {
@@ -113,13 +134,9 @@ void entity_rep_grabber()  {
 	totalRep = (vars.get(3).length() * 1000) + (vars.get(4).length() * 100);
 	totalRep = totalRep + (vars.get(5).length() * 10) + vars.get(6).length();
 
-	// Get next level cost and correct color
- 	nextLevel = entity_level_check( entity_type, totalRep );
- 	repNeeded = nextLevel - totalRep;
-
- 	// Add tab when numbers get too big
- 	if ( nextLevel < 1000 ) { nextLevel=nextLevel + "\t"; }
+	// Get correct entity color 
+	colB = get_color(entity_type);
 
 // Print the results
-	clientGUI.printText("general", "| " + colB + entity_type + colA + "\t  | " + totalRep + " \t | " + repNeeded + "\t\t\t\t   | " +entity_humour+ " |\n");
+	clientGUI.printText("general", "| " + colB + entity_type + colA + "\t  | " + totalRep + " \t | \t\t\t\t   | " +entity_humour+ " |\n");
 }

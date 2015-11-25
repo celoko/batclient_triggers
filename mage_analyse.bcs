@@ -1,0 +1,193 @@
+SCRIPT_NAME = "mage_analyse";
+SCRIPT_DESC = "Reports analysis of magic lore messages to party report channel along with dcrits.";
+SCRIPT_OFF = false;
+
+// Original trigger by Wermine
+// Modified by Erygon
+// V. 1.0
+
+
+// Changes:
+// Tweaked for runemage herbal poison blast and bolt of knowledge
+// Added rift pulse (cold type)
+// typofix: selfpride -> self-pride
+// Added channu spells
+// Cleaned the code a bit
+
+
+//global variables
+String TARGET="";
+String DCRIT="";
+String RESIST="";
+String TYPE="";
+
+String output = "@@party report ";
+
+void bootup() {
+  triggerManager.newTrigger("mage_analyse_reset",
+    "^You declare with a booming voice",
+    "$"+SCRIPT_NAME+".mage_reset");  
+
+  triggerManager.newTrigger("mage_analyse_reset2",
+    "^You are done with the chant",
+    "$"+SCRIPT_NAME+".mage_reset"); 
+
+  triggerManager.newTrigger("mage_analyse_dcrit4",
+    "^Unseen BURSTS of magic are absorbed into the spell!$",
+    "$"+SCRIPT_NAME+".mage_analyse_dcrit 4");
+
+  triggerManager.newTrigger("mage_analyse_dcrit3",
+    "^Your fingertips are surrounded with swirling ENERGY as you cast the spell.$",
+    "$"+SCRIPT_NAME+".mage_analyse_dcrit 3");
+  
+  triggerManager.newTrigger("mage_analyse_dcrit2",
+    "^You feel like you managed to channel additional POWER to your spell.$",
+    "$"+SCRIPT_NAME+".mage_analyse_dcrit 2");
+
+  triggerManager.newTrigger("mage_analyse_dcrit1",
+    "^You feel like your spell gained additional power.$",
+    "$"+SCRIPT_NAME+".mage_analyse_dcrit 1");
+
+  triggerManager.newTrigger("mage_analyse_typeandname",
+    "^You watch with self-pride as your ([A-Za-z -]+) hits ([ A-Za-z',._-]+)",
+    "$"+SCRIPT_NAME+".mage_analyseTypeAndName", false, false, false,
+    new Color[]{new Color(51,255,51)}, Font.PLAIN);
+
+  // Psychic crush
+  triggerManager.newTrigger("mage_analyse_typeandname2",
+     "^You crush ([ A-Za-z',._-]+)''s mind with your psychic attack!$",
+     "$"+SCRIPT_NAME+".mage_analyseTypeNoName");
+
+  // Mind seize
+  triggerManager.newTrigger("mage_analyse_typeandname2",
+     "^You focus on the mind of ([ A-Za-z',._-]+).$",
+     "$"+SCRIPT_NAME+".mage_analyseTypeNoName");
+
+  triggerManager.newTrigger("screami",
+    "([ A-Za-z',._-]+) screams in pain.$",
+    "$"+SCRIPT_NAME+".setResist 0");
+
+  triggerManager.newTrigger("writhei",
+    "^([ A-Za-z',._-]+) writhes in agony.$",
+    "$"+SCRIPT_NAME+".setResist 20");
+     
+  triggerManager.newTrigger("shudderi",
+    "^([ A-Za-z',._-]+) shudders from the force of the attack.$",
+    "$"+SCRIPT_NAME+".setResist 40");
+     
+  triggerManager.newTrigger("grunti",
+    "^([ A-Za-z',._-]+) grunts from the pain.$",
+    "$"+SCRIPT_NAME+".setResist 60");
+     
+  triggerManager.newTrigger("wincei",
+    "^([ A-Za-z',._-]+) winces a little from the pain.$",
+    "$"+SCRIPT_NAME+".setResist 80");
+     
+  triggerManager.newTrigger("shrugi",
+    "^([ A-Za-z',._-]+) shrugs off the attack.$",
+    "$"+SCRIPT_NAME+".setResist 100");
+
+  triggerManager.newTrigger("mage_cere_lite",
+    "^You feel your staff touching your mind.$",
+    "", false, true, false,
+    new Color[]{new Color(255,200,0)}, Font.PLAIN);
+
+  triggerManager.newTrigger("mage_gem_lite",
+    "a shimmering multicoloured crystal gem|a shiny dark-green oval shaped amethyst|a dull white circular weenite gem|a small and almost colourless zircon gem|a silvery-white round pearl",
+    "", false, true, false,
+    new Color[]{new Color(0,255,51)}, Font.PLAIN);
+
+  triggerManager.newTrigger("mage_conceal_info_party",
+    "^You surreptitiously conceal your spell casting.$",
+    "$"+SCRIPT_NAME+".mage_concealReport");
+}
+
+void mage_analyse_dcrit() {
+	if ( argument.equals("1") ) { DCRIT="DCRIT-1 "; }
+	else if ( argument.equals("2") ) { DCRIT="DCRIT-2 "; }
+	else if ( argument.equals("3") ) { DCRIT="DCRIT-3 "; }
+	else if ( argument.equals("4") ) { DCRIT="U-N-S-E-E-N-! "; }
+	
+	// For testing
+	// clientGUI.printText("general", "Crit: " + argument + "!\n", "#FFFF00");
+}
+
+
+// When given spell name, returns spell type 
+// getType("flame arrow"); -> "fire"
+static getType(String name) {
+
+    // Spells
+    String[] poison = {"thorn spray", "poison blast", "venom strike", "power blast", "summon carnal spores", "herbal poison blast" };
+    String[] mana = {"magic missile", "levin bolt", "summon lesser spores", "summon greater spores", "golden arrow", "channelball" };
+    String[] acid = {"acid arrow", "disruption", "acid ray", "acid wind", "acid blast"};
+    String[] asph = {"blast vacuum", "strangulation", "chaos bolt", "suffocation", "vacuumbolt"};
+    String[] cold = {"cold ray", "icebolt", "darkfire", "flaming ice", "chill touch", "rift pulse"}; // don't report spark birth
+    String[] elec = {"electrocution", "forked lightning", "blast lightning", "lightning bolt", "shocking grasp", "channelbolt" };
+    String[] fire = {"lava blast", "meteor blast", "fire blast", "firebolt", "flame arrow", "channelburn" };
+    String[] psi  = {"mind blast", "psi blast", "mind disruption", "bolt of knowledge"};
+
+    if (checkType(poison, name)) {  return "poison";}
+    if (checkType(mana, name)) {    return "mana";}
+    if (checkType(acid, name)) {    return "acid";}
+    if (checkType(asph, name)) {    return "asph";}
+    if (checkType(cold, name)) {    return "cold";}
+    if (checkType(elec, name)) {    return "elec";}
+    if (checkType(fire, name)) {    return "fire";}
+    if (checkType(psi, name)) {     return "psi";}
+    return "";
+}
+
+static boolean checkType(String[] types, String name) {
+
+    for (String spell: types) {
+        if ( name.equals(spell) ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+void mage_analyseTypeAndName() {
+	TARGET = vars.get(2);
+
+    String name = vars.get(1);
+
+    TYPE = getType(name);
+
+    //For testing
+    //clientGUI.printText("general", "Type: " + TYPE + "!\n", "#FFFF00");
+}
+
+void mage_analyseTypeNoName() {
+  TARGET = vars.get(1);
+  TYPE = "psi ";
+}
+
+void setResist(){
+	RESIST = argument+"%";
+
+    if (!TYPE.equals("")) {
+	    doReport();
+    }
+}
+
+void doReport() {
+    String message = TARGET+" resists "+RESIST+" "+TYPE+" "+DCRIT;
+
+    clientGUI.doCommand(output + message);
+}
+
+void mage_concealReport() {
+    clientGUI.doCommand(output + "casting concealed.");
+}
+
+void mage_reset() {
+//Reset all variables (especially important for dcrit)
+  TARGET="target";
+  DCRIT="";
+  RESIST="";
+  TYPE="";
+}
