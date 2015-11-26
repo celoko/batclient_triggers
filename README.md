@@ -10,7 +10,7 @@ bm.bcs - Beastmaster, shows when ride underground/through xx was last used and s
 
 bph.bcs - Bard play script, read lines from file and send to mud on keypress.
 
-entity_rep_counter.bcs - Turns entity rep symbols to numbers and tries to show how much rep is needed for next level.
+entity_rep_counter.bcs - Turns entity rep symbols to numbers and shows levels in gem entity type.
 
 fn.bcs - Item numbers to pro forges, unneeded since forges got this feature.
 
@@ -19,6 +19,8 @@ hit_ranker.bcs - Ranks melee hits, shows (x/26) after the hit.
 kbh_help.bcs - Shows percentages in kbh messages with some lites, bit buggy.
 
 lite_mineral.bcs - Lites multiple minerals and helps to notice deposits.
+
+mage_analyze.bcs - Reports monster resists, works with mage, folke and channu spells.
 
 mh.bcs - Heel message handler for beastmasters. 
 
