@@ -13,7 +13,6 @@ SCRIPT_OFF = false;
 
 
 
-
 // Entity names, change to match your own entities
 String fire_name  = "Aodh";
 String air_name   = "";
@@ -98,27 +97,27 @@ void entity_level_grabber() {
     size_num = 0;
     adj_num = 0;
 
-    if (size.equals("tiny"))        { size_num = 1;}
-    if (size.equals("titchy"))      { size_num = 2;}
-    if (size.equals("miniscule"))   { size_num = 3;}
-    if (size.equals("small"))       { size_num = 4;}
-    if (size.equals("medium"))      { size_num = 5;}
-    if (size.equals("large"))       { size_num = 6;}
-    if (size.equals("huge"))        { size_num = 7;}
-    if (size.equals("enormous"))    { size_num = 8;}
-    if (size.equals("humongous"))   { size_num = 9;}
+    if (size.equals("tiny"))        { size_num = 0;}
+    if (size.equals("titchy"))      { size_num = 1;}
+    if (size.equals("miniscule"))   { size_num = 2;}
+    if (size.equals("small"))       { size_num = 3;}
+    if (size.equals("medium"))      { size_num = 4;}
+    if (size.equals("large"))       { size_num = 5;}
+    if (size.equals("huge"))        { size_num = 6;}
+    if (size.equals("enormous"))    { size_num = 7;}
+    if (size.equals("humongous"))   { size_num = 8;}
 // Garantuan is different
 
-    if (adj.equals("glowing"))      { adj_num = 1;}
-    if (adj.equals("shimmering"))   { adj_num = 2;}
-    if (adj.equals("gleaming"))     { adj_num = 3;}
-    if (adj.equals("sizzling"))     { adj_num = 4;}
-    if (adj.equals("sparkling"))    { adj_num = 5;}
-    if (adj.equals("glittering"))   { adj_num = 6;}
-    if (adj.equals("radiating"))    { adj_num = 7;}
-    if (adj.equals("throbbing"))    { adj_num = 8;}
-    if (adj.equals("pulsating"))    { adj_num = 9;}
-    if (adj.equals("blazing"))      { adj_num = 10;}
+    if (adj.equals("glowing"))      { adj_num = 0;}
+    if (adj.equals("shimmering"))   { adj_num = 1;}
+    if (adj.equals("gleaming"))     { adj_num = 2;}
+    if (adj.equals("sizzling"))     { adj_num = 3;}
+    if (adj.equals("sparkling"))    { adj_num = 4;}
+    if (adj.equals("glittering"))   { adj_num = 5;}
+    if (adj.equals("radiating"))    { adj_num = 6;}
+    if (adj.equals("throbbing"))    { adj_num = 7;}
+    if (adj.equals("pulsating"))    { adj_num = 8;}
+    if (adj.equals("blazing"))      { adj_num = 9;}
 
     clientGUI.printText("general", "| " + size + "(" +size_num + ")\t " + adj + "(" + adj_num +") |\n");
     clientGUI.printText("general", "|--------------------------------------------------------------------------|\n");
