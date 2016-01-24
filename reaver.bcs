@@ -1,0 +1,96 @@
+SCRIPT_NAME = "reaver";
+SCRIPT_DESC = "Triggers for reavers";
+
+// Version 1.0 - 2016
+
+import java.text.NumberFormat;
+
+String name;
+String hit_nr;
+String energy_diff;
+
+float energy;
+float old_energy=0;
+
+String hit_color = "#00FF00";
+String fail_color = "#FF0000";
+
+
+// Reaver energy difference format x.xxx
+final NumberFormat nf = NumberFormat.getInstance();
+nf.setMinimumFractionDigits(3);
+nf.setMaximumFractionDigits(3);
+nf.setGroupingUsed(false);
+
+public void rs_hit1(){
+    name=vars.get(1);
+    // Reaver Strike hit 1
+    clientGUI.printText("general", "[HIT1] You score a nasty cut on "+name+"\'s shoulder.\n", hit_color);
+}
+
+public void rs_hit2(){
+    hit_nr=vars.get(1);
+    // Reaver Strike hit 2
+    clientGUI.printText("general", "[HIT2] You attack and swing again, ripping open "+hit_nr+" side!\n", hit_color);
+}
+
+public void rs_hit3(){
+    name=vars.get(1);
+    // Reaver Strike hit 2
+    clientGUI.printText("general", "[HIT3] You attack and swing a THIRD time, striking "+name+" right in the neck!\n", hit_color);
+}
+
+public void rs_fail(){
+    name=vars.get(1);
+    hit_nr=vars.get(2);
+    // Reaver Strike fail
+    clientGUI.printText("general", "[RS FAIL!] "+name+" shifts position and you cannot hit the "+hit_nr+" time.\n", fail_color);
+}
+
+public void energy_count(){
+
+    // get current energy, convert to float
+    energy=Float.parseFloat(vars.get(1));
+
+    if (old_energy!=0) {
+        // Calculate difference and format string to x.xxx
+        energy_diff = nf.format(energy-old_energy);
+        clientGUI.printText("general", "You are "+energy+"% of the way to becoming an Ultimate Reaver. ("+energy_diff+")\n");
+    } else {
+        clientGUI.printText("general", "You are "+energy+"% of the way to becoming an Ultimate Reaver. \n"); // Space after . to prevent loop
+    }   
+//    clientGUI.printText("general", "\nEnergy: "+energy+" Old energy: "+old_energy+" Sign:"+sign+" Diff: "+energy_diff+"\n");
+    old_energy=energy;
+}
+
+
+void bootup(){
+	// Reaver strike messages
+	triggerManager.newTrigger("reaver_strike1",
+	"^You score a nasty cut on ([A-Za-z -'.]*)\'s shoulder.$",
+	"$"+SCRIPT_NAME+".rs_hit1", true, false, false, null, Font.PLAIN);
+
+    triggerManager.newTrigger("reaver_strike2",
+    "^You attack and swing again, ripping open (his|her|its) side!$",
+    "$"+SCRIPT_NAME+".rs_hit2", true, false, false, null, Font.PLAIN); 
+
+    triggerManager.newTrigger("reaver_strike3",
+    "^You attack and swing a THIRD time, striking ([A-Za-z -'.]*) right in the neck!$",
+    "$"+SCRIPT_NAME+".rs_hit3", true, false, false, null, Font.PLAIN);
+
+    triggerManager.newTrigger("reaver_strike_fail",
+    "^([A-Za-z -'.]*) shifts position and you cannot hit the (second|third) time.$",
+    "$"+SCRIPT_NAME+".rs_fail", true, false, false, null, Font.PLAIN);    
+	
+    // Energy increase info
+    //You are 27.5674% of the way to becoming an Ultimate Reaver.
+    triggerManager.newTrigger("energy_catcher",
+    "You are ([0-9.]*)% of the way to becoming an Ultimate Reaver.$",
+    "$"+SCRIPT_NAME+".energy_count", true, false, false, new Color[]{new Color(204,204,0)}, Font.PLAIN);
+
+
+
+
+}
+
+
