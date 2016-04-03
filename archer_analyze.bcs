@@ -1,0 +1,61 @@
+SCRIPT_NAME = "archer_analyze";
+SCRIPT_DESC = "Reports resists";
+SCRIPT_OFF = false;
+
+//global variables
+archer_target = "";
+
+void bootup() {
+
+  triggerManager.newTrigger("archer_get_name",
+    "^You fire [a-z ]+ at ([A-Za-z -]+)[.]$",
+    "$"+SCRIPT_NAME+".set_target_name");  
+
+  triggerManager.newTrigger("archer_wound_watcher",
+    "^You see from the wound your shot did (almost no|just a bit of|some|a lot of|full) (acid|asphyxiation|cold|electrical|fire|magical|physical|psionic) damage[.]$",
+    "$"+SCRIPT_NAME+".check_type");
+
+}
+
+void set_target_name() {
+    archer_target = vars.get(1);
+
+    //clientGUI.doCommand("@@party report " + archer_target);
+}
+
+
+void check_type() {
+
+    damage = vars.get(1);
+    type   = vars.get(2);
+    resist = 0;
+
+    // Turn damage message into a number
+    if (damage.equals("full")) {
+        resist = 0;
+    } else if (damage.equals("a lot of")) {
+        resist = 25;
+    } else if (damage.equals("some")) {
+        resist = 50;
+    } else if (damage.equals("just a bit of")) {
+        resist = 75;
+    } else if (damage.equals("almost no")) {
+        resist = 100;
+    }
+
+    // check that we have proper type and do report
+    if (type.equals("acid") ||
+        type.equals("asphyxiation") ||
+        type.equals("cold") ||
+        type.equals("electrical") ||
+        type.equals("fire") ||
+        type.equals("magical") ||
+        type.equals("physical") ||
+        type.equals("psionic")){
+        report(resist, type);
+    }
+}
+
+void report(int resist, String type) {
+  clientGUI.doCommand("@@party report " + archer_target + " resists " + resist + "% " + type);
+}
