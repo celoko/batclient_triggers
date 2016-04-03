@@ -19,8 +19,6 @@ void bootup() {
 
 void set_target_name() {
     archer_target = vars.get(1);
-
-    //clientGUI.doCommand("@@party report " + archer_target);
 }
 
 
@@ -53,9 +51,18 @@ void check_type() {
         type.equals("physical") ||
         type.equals("psionic")){
         report(resist, type);
+        
+        // Clear name after report
+        archer_target = "";
     }
 }
 
 void report(int resist, String type) {
-  clientGUI.doCommand("@@party report " + archer_target + " resists " + resist + "% " + type);
+
+    // Report only if we have name
+    if (archer_target != "") {
+        // Safe version, doesn't report name.
+        //clientGUI.doCommand("@@party report Target resists " + resist + "% " + type);
+        clientGUI.doCommand("@@party report " + archer_target + " resists " + resist + "% " + type);
+    }
 }
