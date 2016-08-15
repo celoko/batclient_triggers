@@ -1,17 +1,15 @@
 SCRIPT_NAME = "plantlore_book";
 
-// Version 1.0
+// Version 1.1
 // Thanks to Jermu's batmud pit for terrain info
+
+// Usage:
+// pl
+// pl herbname
+// pl list
 
 import java.util.*;
 import com.mythicscape.batclient.interfaces.*;
-
-/*
-Possible plants to find in BatMUD's wilderness:
--trees
-appletree(autumn), arnica(summer), baneberry(autumn), barberry(autumn), barrel_cactus(spring, summer, autumn or winter), bearberry(autumn, winter), blood_moss(autumn), bloodroot(winter), blueberry(summer, autumn), boneset(summer), borage(summer), burdock(summer), buttercup(spring, summer, autumn), cabbage(summer), cacao(spring, summer, autumn, winter), carrot(summer), cauliflower(summer), cedar, chickweed(spring, autumn, winter), chicory(winter), comfrey(winter), corn(autumn), costmary(summer), cotton(autumn), crystalline(winter), date(summer), death_cap(autumn, winter), elder(summer), foxglove(summer), garlic(summer), ginseng(winter), grape(autumn), hcliz(autumn), hemlock(summer), henbane(summer), holly(winter), honeysuckle(summer), jaslah(autumn), jimsonweed(summer), lettuce(summer), lingonberry(summer, autumn), lobelia(summer), lungwort(summer), mandrake(winter), mangrel(spring, summer, autumn, winter), mistletoe(autumn), mugwort(autumn), mushroom(spring), mystic_spinach(summer), nightshade(summer), oak(summer), onion(summer), papaya(summer, autumn, winter), peartree(summer), pinetree(autumn), plumtree(summer), potato(summer), raspberry(summer), rhubarb(spring, summer), rose(summer), soapwort(winter), spinach(summer), strawberry(summer), sweet_flag(winter), thistle(autumn), tomato(summer), turnip(summer), vine(summer), water_lily(spring, summer), wheat(summer), wolfbane(summer), wormwood(autumn), yarrow(autumn)
-*/
-
 
 LinkedHashMap plants = new LinkedHashMap();
 
