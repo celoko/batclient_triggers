@@ -18,6 +18,8 @@ hit_ranker.bcs - Ranks melee hits, shows (x/26) after the hit.
 
 kbh_help.bcs - Shows percentages in kbh messages with some lites, bit buggy.
 
+libe_ghost_count.bcs - Shows count of ghosts by power and profession. <a href="https://github.com/celoko/batclient_triggers/blob/master/libe_ghost_count.bcsi"></a>
+
 lite_mineral.bcs - Lites multiple minerals and helps to notice deposits.
 
 mage_analyze.bcs - Reports monster resists, works with mage, folke and channu spells.
