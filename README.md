@@ -18,7 +18,7 @@ hit_ranker.bcs - Ranks melee hits, shows (x/26) after the hit.
 
 kbh_help.bcs - Shows percentages in kbh messages with some lites, bit buggy.
 
-libe_ghost_count.bcs - Shows count of ghosts by power and profession. <a href="https://github.com/celoko/batclient_triggers/blob/master/libe_ghost_count.bcsi"></a>
+libe_ghost_count.bcs - Shows count of ghosts by power and profession. [Info](https://celoko.github.io/liberator/liberator_ghost_count.html)
 
 lite_mineral.bcs - Lites multiple minerals and helps to notice deposits.
 
