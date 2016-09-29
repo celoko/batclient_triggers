@@ -1,0 +1,118 @@
+SCRIPT_NAME = "libe_ghost_count";
+SCRIPT_DESC = "Shows number of ghosts by type and profession";
+
+// Erygon 2016
+// V 1.0
+//
+// Usage: lgc
+//
+
+// Set your preferred lines setting here
+int lines = 65;
+
+String old_power = "";
+String old_prof = "";
+
+String output = "";
+
+// counter for powers, 0 = apprentice, 1 = journeyman, etc
+powers = new int[4];
+
+void enableCount()	{
+	clientGUI.doCommand("/trigenable lb_count_ghosts");
+	clientGUI.doCommand("/trigenable lb_end_list");
+	clientGUI.doCommand("/trigenable lb_headline");
+    clientGUI.doCommand("gagoutput lines 150");
+    clientGUI.doCommand("liberator ghosts profession");
+    clientGUI.doCommand("gagoutput lines " + lines);
+
+    old_power = "";
+    old_prof  = "";
+    
+    resetPowers();
+}
+
+public String processCommand() {
+
+    if ( command.equals("lgc") ) {
+        enableCount();
+        return null;
+    } else {
+        return command;
+    }
+}
+
+void resetPowers() {
+    powers[0] = 0;
+    powers[1] = 0;
+    powers[2] = 0;
+    powers[3] = 0;
+}
+
+void endList() {
+    clientGUI.doCommand("/trigdisable lb_count_ghosts");
+	clientGUI.doCommand("/trigdisable lb_end_list");
+	clientGUI.doCommand("/trigdisable lb_headline");
+    printStats();
+}
+
+void printHeadline() {
+    clientGUI.printText("general", "Count\tPower       Profession\n");
+}
+
+void printStats() {
+    if (powers[3] > 0) {
+	    clientGUI.printText("general", powers[3] + "\tgrandmaster " + old_prof +"\n");
+    }
+    if (powers[2] > 0) {
+	    clientGUI.printText("general", powers[2] + "\tmaster      " + old_prof +"\n");
+    }
+    if (powers[1] > 0) {
+	    clientGUI.printText("general", powers[1] + "\tjourneyman  " + old_prof +"\n");
+    }
+    if (powers[0] > 0) {
+	    clientGUI.printText("general", powers[0] + "\tapprentice  " + old_prof +"\n");
+    }
+}
+
+void count()	{
+
+    String power = vars.get(3);
+    String prof  = vars.get(4);
+
+    if (old_prof.equals("")) {
+        old_prof = prof;
+    } else if (!old_prof.equals(prof)) {
+        printStats();
+        resetPowers();
+        old_prof = prof;
+    }
+
+    if (power.equals("apprentice")) {
+        powers[0] += 1;
+    } else if (power.equals("journeyman")) {
+        powers[1] += 1;
+    } else if (power.equals("master")) {
+        powers[2] += 1;
+    } else if (power.equals("grandmaster")) {
+        powers[3] += 1;
+    }
+}
+
+void bootup() {
+  triggerManager.newTrigger("lb_count_ghosts",
+    "^[0-9]+?([ ]+->[ ]+)??([ ]+)?[A-z]+[ ]+(apprentice|journeyman|master|grandmaster)[ ]+(armoursmith|barbarian|cook|farmer|guardian|locksmith|magician|peasant|priest|ranger|sage|soldier|weaponsmith|witch)",
+    "$"+SCRIPT_NAME+".count", true, false, false,
+    null, Font.PLAIN);
+
+  triggerManager.newTrigger("lb_headline",
+    "^Id     Name           Power          Profession     Condition$",
+    "$"+SCRIPT_NAME+".printHeadline", true, false, false,
+    null, Font.PLAIN);
+
+  triggerManager.newTrigger("lb_end_list",
+    "^Total of [0-9]+ ghost shown. Maximum you can control is [0-9]+.$",
+    "$"+SCRIPT_NAME+".endList", false, false, false,
+    null, Font.PLAIN);
+}
+
