@@ -101,7 +101,7 @@ void count()	{
 
 void bootup() {
   triggerManager.newTrigger("lb_count_ghosts",
-    "^[0-9]+?([ ]+->[ ]+)??([ ]+)?[A-z]+[ ]+(apprentice|journeyman|master|grandmaster)[ ]+(armoursmith|barbarian|cook|farmer|guardian|locksmith|magician|peasant|priest|ranger|sage|soldier|weaponsmith|witch)",
+    "^[0-9]+?([ ]+->[ ]+)??([ ]+)?[A-z]+[ ]+(apprentice|journeyman|master|grandmaster)[ ]+(armoursmith|barbarian|cook|farmer|guardian|locksmith|magician|peasant|priest|ranger|seer|sage|soldier|weaponsmith|witch)",
     "$"+SCRIPT_NAME+".count", true, false, false,
     null, Font.PLAIN);
 
