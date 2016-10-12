@@ -114,5 +114,11 @@ void bootup() {
     "^Total of [0-9]+ ghost shown. Maximum you can control is [0-9]+.$",
     "$"+SCRIPT_NAME+".endList", false, false, false,
     null, Font.PLAIN);
+
+    // Start with triggers disabled
+    clientGUI.doCommand("/trigdisable lb_count_ghosts");
+	clientGUI.doCommand("/trigdisable lb_end_list");
+	clientGUI.doCommand("/trigdisable lb_headline");
+
 }
 
