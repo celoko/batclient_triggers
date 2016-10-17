@@ -1,0 +1,143 @@
+SCRIPT_NAME = "season_times";
+SCRIPT_DESC = "Shows when seasons start in rl time and highlights next season.";
+
+// Erygon 2016
+// V 1.0
+//
+// Usage: time all
+// NOTE: Laenor, deso and furn have same seasons,
+
+import java.util.*;
+
+int days = 0; // Current date in days format 
+String colB = "\033[1m\033[32m";    // green color
+String colA = "\033[0m";            // clear color
+
+LinkedHashMap dates_lae = new LinkedHashMap(); // Lae,luce,furn have same seasons
+LinkedHashMap dates_rot = new LinkedHashMap();
+LinkedHashMap dates_luc = new LinkedHashMap();
+// season, ((month - 1) * 28) + day
+dates_lae.put("spring", 246);
+dates_lae.put("summer", 26);
+dates_lae.put("autumn", 134);
+dates_lae.put("winter", 170);
+
+dates_rot.put("spring", 2);
+dates_rot.put("summer", 57);
+dates_rot.put("autumn", 105);
+dates_rot.put("winter", 146);
+
+dates_luc.put("spring", 222);
+dates_luc.put("summer", 2);
+dates_luc.put("autumn", 108);
+dates_luc.put("winter", 198);
+
+int countdays(int month, int day) {
+    return ((month - 1) * 28) + day; 
+}
+
+String formatdate(rlhours) {
+    int days = rlhours / 24;
+    int hours = rlhours % 24;
+
+    return days + "d, " + hours + "h";
+}
+
+void setdate() {
+    int day = Integer.parseInt(vars.get(1));
+    int month = Integer.parseInt(vars.get(3));
+
+    days = countdays(month, day);
+}
+
+int findmin(LinkedHashMap list) {
+    int min = 0;
+
+    for (String key : list.keySet()) {
+        if (min == 0 || list.get(key) < min) {
+            min = list.get(key);
+        }
+    }
+    return min;
+}
+
+String getoutput(LinkedHashMap cont) {
+    String output = "";
+    
+    LinkedHashMap st = new LinkedHashMap();
+    
+    int hours = 0;
+    int min = 0;
+
+    // Calculate hours and store in linkedhashmap for min value check
+    for (String key : cont.keySet()) {
+        int diff = 0;
+        if (days > cont.get(key)) {
+            tcont = cont.get(key) + 280;
+            diff = tcont - days;
+        } else {
+            diff = cont.get(key) - days;
+        }
+
+        hours = diff * 2;
+        st.put(key, hours);
+    }
+
+    min = findmin(st); // find next season
+
+    // make output string and colorize next season
+    for (String key : st.keySet()) {
+        String time = formatdate(st.get(key));
+
+        if (st.get(key) == min) {
+            output += "\t| " + colB + key + colA + " (" + time + ")";
+        } else {
+            output += "\t| " + key + " (" + time + ")";
+        }
+    }
+
+    return output;
+}
+
+void showtimes() {
+    String season = vars.get(1);
+    String cont = vars.get(2);
+    
+    String output = "";
+
+    if (cont.equals("Laenor")) {
+        cont = "Lae/Des/Fur";
+        output = getoutput(dates_lae);
+    }
+
+    // Laenor, deso and furn have same seasons, so only show laenor
+    if (cont.equals("Desolathya") || cont.equals("Furnachia")) {
+        return;
+    }
+
+    if (cont.equals("Rothikgen")) {
+        cont += "  "; // padding
+        output = getoutput(dates_rot);
+    }
+
+    if (cont.equals("Lucentium")) {
+        cont += "  ";
+        output = getoutput(dates_luc);
+    }
+
+    clientGUI.printText("general", "[ " + cont + " : " + season + " ]" + output + "\n");
+}
+
+void bootup() {
+  triggerManager.newTrigger("st_getdate",
+    "^Today is the ([0-9]+)(st|rd|th) day of the ([0-9]+)(st|rd|th) month \\([a-zA-Z]+\\) of the year ([0-9]+).$",
+    "$"+SCRIPT_NAME+".setdate", false, false, false,
+    null, Font.PLAIN);
+
+  triggerManager.newTrigger("st_getcont",
+    "^It's (spring|summer|autumn|winter) in (Laenor|Desolathya|Lucentium|Rothikgen|Furnachia).$",
+    "$"+SCRIPT_NAME+".showtimes", true, false, false,
+    null, Font.PLAIN);
+}
+
+
