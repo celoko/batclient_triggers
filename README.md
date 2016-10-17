@@ -30,6 +30,8 @@ pl.bcs - Gets npc pirate ship names from ship scan and puts them to aliases.
 
 plantlore_book.bcs - Script that shows plant season and location info.
 
+season_times.bcs - Shows when seasons start in rl time. [Info](https://celoko.github.io/season_times.html)
+
 taming.bcs - Shows success/fails etc. when taming animals. Helps figuring out how well you are doing.
 
 
