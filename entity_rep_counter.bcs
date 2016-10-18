@@ -36,7 +36,7 @@ void bootup() {
 		"$"+SCRIPT_NAME+".entity_rep_grabber",true,false,false,null,Font.PLAIN);
 
 	triggerManager.newTrigger("entity_level_grabber",
-		"^\\| ([A-Za-z ]+, a|A) (tiny|titchy|miniscule|small|medium|large|huge|enormous|humongous) (fire|air|water|earth|magic) entity (glowing|shimmering|gleaming|sizzling|sparkling|glittering|radiating|throbbing|pulsating|blazing)",
+		"^\\| ([A-Za-z ]+, a|A|An) (tiny|titchy|miniscule|small|medium|large|huge|enormous|humongous) (fire|air|water|earth|magic) entity (glowing|shimmering|gleaming|sizzling|sparkling|glittering|radiating|throbbing|pulsating|blazing)",
 		"$"+SCRIPT_NAME+".entity_level_grabber",false,false,false,null,Font.PLAIN);
 
 	// Gag title line and print another
