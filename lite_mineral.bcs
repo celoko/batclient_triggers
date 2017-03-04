@@ -1,8 +1,15 @@
-// Usage: '$lite_mineral all' to lite all minerals
-// 		  '$lite_mineral on/off to enable or disable script
-// 		  '$lite_mineral show' to show selected minerals
-// 		  '$lite_mineral ruby diamond basalt' to set minerals
-//		  '$lite_mineral bell' tp toggle bell 
+// Usage: 'ml all' to lite all minerals
+// 		  'ml on/off' to enable or disable script
+// 		  'ml show' to show selected minerals
+// 		  'ml add ruby diamond basalt' to set(replace) minerals
+//		  'mp bell' toggle bell
+
+
+/* TODO:
+ * make script read loc from desc
+ * Loc:    Untamed Highlands [330,344]
+*/
+
 
 SCRIPT_NAME = "lite_mineral";                                                                                    
 SCRIPT_DESC = "Lite minerals";                                                                              
@@ -108,35 +115,43 @@ void turnOn() {
 	enabled = true;
 }
 
-void run(){
+public String processCommand() {
 
-	// When no argument, lite all minerals
-  	if (argument == null || ("".equals(argument)) ) {
-		argument = "all";
-		turnOn();
-	} else if ( argument.equals("show") ) {
-	} else if ( argument.equals("off") ) {
-		turnOff();
-	} else if ( argument.equals("on") ) {
-		turnOn();
-	} else if (argument.equals("bell") ) {
-		if ( bell == false ) { 
-			bell = true; 
-		} else { 
-			bell = false; 
-		}
- 	} else {
-		minerals.clear();
+    if ( command.startsWith("ml add") ) {
+        minerals.clear();
 
-		String[] args = argument.split(" ");
-
+        String[] args = command.replace("ml add ", "").split(" ");
+        
 		// Go through arguments and add to minerals
 		for (mineral : args) {
 			minerals.add(mineral);		
 		}		
+	    clientGUI.printText("general", "Now liting: " + minerals.toString() + "\n", "#FFFF00");
 		turnOn();
-	}
-	showLites();					
+        return null;
+    } else if (command.equals("ml show")) {
+        showLites();
+        return null;
+    } else if (command.equals("ml off")) {
+        clientGUI.printText("general", "Mineral lite disabled.\n", "#FFFF00");
+        turnOff();
+        return null;
+    } else if (command.equals("ml on")) {
+        clientGUI.printText("general", "Mineral lite enabled.\n", "#FFFF00");
+        turnOn();
+        return null;
+    } else if (command.equals("ml bell")) {
+		if ( bell == false ) { 
+			bell = true; 
+            clientGUI.printText("general", "Bell on.\n", "#FFFF00");
+		} else { 
+            clientGUI.printText("general", "Bell off.\n", "#FFFF00");
+			bell = false; 
+		}
+        return null;
+    } else {
+        return command;
+    }   
 }
 
 void bootup() {
@@ -152,5 +167,6 @@ void bootup() {
         "(deposit |abyss |lode |graveyard |protrusion |slab |crag |gloss |hill )",
         "$"+SCRIPT_NAME+".checkMatch", false, false, true, yellow, Font.PLAIN);
 
+    turnOff();
 }
 
