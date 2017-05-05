@@ -1,0 +1,84 @@
+SCRIPT_NAME = "identify_materials.bcs";
+SCRIPT_DESC = "Command that shows eq materials";
+
+// THIS SCRIPT REQUIRES eq data file
+// Get it from https://github.com/celoko/batclient_triggers/blob/master/eq.csv
+// and modify file path in loadData() function
+
+// Data was kindly provided by Nosunrise, http://batshoppe.dy.fi/index.php
+
+// Usage: tid equipment name
+// For example:
+// tid serp
+// NAME: Serpentyne the Sword of the Serpents  MATS: diamond
+
+// Script is case-insensitive, search pattern and eq name is lowercased before comparing.
+// Returns max 30 items by default, change resultLimit if needed.
+
+Map nameMaterial = new LinkedHashMap();
+int resultCount = 0;
+
+// Max number of results
+int resultLimit = 30;
+
+// Read data from file and store to hashmap
+void loadData() {
+
+    // Change path to eq data file
+    file = "./path/to/eq.csv";
+
+    try{
+        InputStream fis=new FileInputStream(file);
+        BufferedReader br=new BufferedReader(new InputStreamReader(fis));
+
+        while ((line = br.readLine()) != null) {
+            
+            String[] parts = line.split(";");
+            String name = parts[0];
+            String materials = parts[1];
+
+            nameMaterial.put(name, materials);  
+        }
+        br.close();
+    }
+    catch(Exception e){
+        System.err.println("Error: Target File Cannot Be Read");
+    }
+}
+
+public String processCommand(){
+    
+    if (command.startsWith("tid ")){
+        String pattern = command.substring(4); // Remove prefix
+        resultCount = 0;    // Reset result count
+
+        clientGUI.printText("general", command + "\n" ); // Echo command to player
+
+        for (Map.Entry entry : nameMaterial.entrySet()) {
+
+            if (entry.getKey().toLowerCase().indexOf(pattern.toLowerCase()) > -1 ) {
+                clientGUI.printText("general", "NAME: " + entry.getKey() + "  MATS: " + entry.getValue() + "\n" );
+                resultCount++;
+
+                // Don't show too many results
+                if (resultCount > resultLimit) {
+                    clientGUI.printText("general", "Found more than " + resultLimit + " items. Cutting results.\n" );
+                    break;
+                }
+            }
+        }
+
+        // Show info if nothing is found
+        if (resultCount == 0) {
+            clientGUI.printText("general", "No results.\n" );
+        }
+        return null;
+    } else {
+        return command;
+    }
+}
+
+
+void bootup() {
+	loadData();
+}
