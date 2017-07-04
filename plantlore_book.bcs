@@ -1,6 +1,6 @@
 SCRIPT_NAME = "plantlore_book";
 
-// Version 1.1
+// Version 1.2
 // Thanks to Jermu's batmud pit for terrain info
 
 // Usage:
@@ -39,13 +39,13 @@ plants.put("comfrey", new String[] { "winter", "Beachs, Volcanos, Mountains, Sha
 plants.put("corn", new String[] { "autumn", "Trails, Plains, Fields, Highlands"} );
 plants.put("costmary", new String[] { "summer", "Hills, Valleys, Jungles, Forests, Waterfalls, Deepforests"} );
 plants.put("cotton", new String[] { "autumn", "Trails, Plains, Fields, Highlands"} );
-plants.put("crystalline", new String[] { "winter", ""} ); // terrain not shown
+plants.put("crystalline", new String[] { "winter", "Roads, Beachs, Ruins, Tundras, Volcanos, Mountains, Badlands, Shallows"} );
 plants.put("date", new String[] { "summer", "Peaks, Deserts"} );
 plants.put("death_cap", new String[] { "autumn, winter", "Beachs, Swamps, Trails, Hills, Plains, Valleys, Jungles, Fields, Forests, Volcanos, Mountains, Shallows, Waterfalls, Highlands, Deepforests"} );
 plants.put("ebony", new String[] { "any", "Swamps, Trails, Hills, Plains, Valleys, Fields, Forests, Waterfalls, Highlands, Deepforests"} );
 plants.put("elder", new String[] { "summer", "Hills, Valleys, Forests, Waterfalls and Deepforests"} );
 plants.put("elm", new String[] { "any", "Trails, Hills, Plains, Valleys, Fields, Forests, Waterfalls, Highlands, Deepforests"} );
-plants.put("foxglove", new String[] { "summer", "Hills, Forests, Waterfalls"} );
+plants.put("foxglove", new String[] { "summer", "Forests, Hills, Waterfalls"} );
 plants.put("garlic", new String[] { "summer", "Hills, Valleys, Forests, Waterfalls, Deepforests"} );
 plants.put("ginseng", new String[] { "winter", "Valleys, Jungles, Deepforests"} );
 plants.put("grape", new String[] { "autumn", "Hills, Valleys, Jungles, Forests, Waterfalls, Deepforests"} );
@@ -53,11 +53,11 @@ plants.put("gray_lichen", new String[] { "?", ""} );
 plants.put("green_grass", new String[] { "?", ""} );
 plants.put("green_moss", new String[] { "?", ""} );
 plants.put("hcliz", new String[] { "autumn", "Peaks, Deserts"} );
-plants.put("hemlock", new String[] { "summer", ""} ); // terrain not shown
-plants.put("henbane", new String[] { "summer", ""} ); // terrain not shown
+plants.put("hemlock", new String[] { "summer", "Plains, Highlands"} );
+plants.put("henbane", new String[] { "summer", "Jungles"} );
 plants.put("holly", new String[] { "winter", "Trails, Hills, Valleys, Fields, Forests, Waterfalls, Deepforests"} );
 plants.put("honeysuckle", new String[] { "summer", "Trails, Hills, Plains, Fields, Forests, Waterfalls, Highlands"} );
-plants.put("jaslah", new String[] { "autumn", ""} ); // terrain not shown
+plants.put("jaslah", new String[] { "autumn", "Peaks, Deserts"} );
 plants.put("jimsonweed", new String[] { "summer", "Beachs, Ruins, Volcanos, Mountains, Badlands, Shallows"} ); 
 plants.put("lettuce", new String[] { "summer", "Swamps, Trails, Plains, Fields, Highlands"} );
 plants.put("lingonberry", new String[] { "summer, autumn", "magical realms"} );
@@ -71,13 +71,14 @@ plants.put("maple", new String[] { "any", "Trails, Hills, Valleys, Fields, Fores
 plants.put("mistletoe", new String[] { "autumn", "Hills, Valleys, Jungles, Forests, Waterfalls, Deepforests"} );
 plants.put("mugwort", new String[] { "autumn", "Beachs, Swamps, Volcanos, Mountains, Shallows"} );
 plants.put("mushroom", new String[] { "spring", "Beachs, Swamps, Trails, Hills, Plains, Valleys, Jungles, Fields, Forests, Mountains, Shallows, Waterfalls, Highlands, Deepforests"} );
-plants.put("mystic_spinach", new String[] { "summer", ""} );
+plants.put("mystic_carrot", new String[] { "summer", "Jungles"} );
+plants.put("mystic_spinach", new String[] { "summer", "Beachs, Volcanos, Mountains, Shallows"} );
 plants.put("nightshade", new String[] { "summer", "Trails, Fields"} );
-plants.put("oak", new String[] { "summer", ""} ); // FIX
+plants.put("oak", new String[] { "summer", "Trails, Hills, Valleys, Fields, Forests, Waterfalls, Deepforests"} );
 plants.put("onion", new String[] { "summer", "Swamps, Trails, Plains, Fields, Highlands"} );
 plants.put("papaya", new String[] { "summer, autumn, winter", "Jungles"} );
 plants.put("peartree", new String[] { "summer", "Trails, Hills, Plains, Valleys, Fields, Forests, Waterfalls, Highlands, Deepforests"} );
-plants.put("pinetree", new String[] { "autumn", ""} ); // FIX
+plants.put("pinetree", new String[] { "autumn", "Trails, Hills, Valleys, Fields, Forests, Waterfalls, Deepforests"} );
 plants.put("plumtree", new String[] { "summer", "Trails, Hills, Valleys, Fields, Forests, Waterfalls, Deepforests"} );
 plants.put("potato", new String[] { "summer", "Trails, Plains, Fields, Highlands"} );
 plants.put("raspberry", new String[] { "summer", "Beachs, Swamps, Trails, Hills, Ruins, Plains, Fields, Forests, Volcanos, Mountains, Badlands, Shallows, Waterfalls, Highlands"} );
