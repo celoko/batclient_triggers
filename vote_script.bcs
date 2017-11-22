@@ -1,0 +1,124 @@
+SCRIPT_NAME = "vote_script";
+import java.net.*;
+import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+// Script works with the help of builtin voted command
+// Usage:
+// Type 'voted' or 'voted reset'
+// If it returns 'Thank you for voting and supporting BatMUD! You may vote again in 12 hours.',
+// voting is enabled, type 'vote' to vote.
+// You get some info about the process.
+// Works only on topmudsites for now
+
+// How does it work?
+// First it gets parameters from http://www.topmudsites.com/vote-batmud.html
+// and to vote, it sends http post request to http://www.topmudsites.com/vote.php
+// I don't know if this actually works, because TMS doesn't show if voting was successful,
+// to prevent scripts like this.
+
+// V. 0.1
+// Erygon 2017
+
+private final String USER_AGENT = "Mozilla/5.0";
+boolean canVote = false;
+
+// Reads parameters from TMS website and returns urlParameters string
+String readTMSParams() {
+    String pm = "";
+
+    Pattern namePattern = Pattern.compile("name=\"(do|oldhash|test|mudid|votehash)\"");
+    Pattern valuePattern = Pattern.compile("value=\"([0-9a-z]+)\"");
+
+    // Open website
+    URL topmudsites = new URL("http://www.topmudsites.com/vote-batmud.html");
+    BufferedReader in = new BufferedReader(
+    new InputStreamReader(topmudsites.openStream()));
+
+    // Go through source, line by line
+    String inputLine;
+    while ((inputLine = in.readLine()) != null) {
+        // Get lines that have parameters
+        Matcher nameMatcher = namePattern.matcher(inputLine);
+        if (nameMatcher.find()) {
+            Matcher valueMatcher = valuePattern.matcher(inputLine);
+            if (valueMatcher.find()) {
+                // Create urlParameters
+                // ex: do=in&oldhash=aa09cb1e4d3e309fdf28323085cdb6c1&test=1554e6397c77ec139781aadcbb56c8f3&mudid=253516&votehash=aa09cb1e4d3e309fdf28323085cdb6c1
+                pm += nameMatcher.group(1) + "=" + valueMatcher.group(1) + "&";
+            }
+        }
+    }
+    in.close();
+
+    // Remove last &
+    pm = pm.substring(0, pm.length() - 1);
+
+    return pm;
+}
+
+private void voteTMS() throws Exception {
+
+    clientGUI.printText("general", "\nVoting for Batmud in TMS\n");
+
+    String url = "http://www.topmudsites.com/vote.php";
+    URL obj = new URL(url);
+    HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+    String urlParameters = readTMSParams();
+
+    byte[] postData = urlParameters.toString().getBytes("UTF-8");
+    int    postDataLength = postData.length;
+
+    //add reuqest header
+    con.setRequestMethod("POST");
+    con.setRequestProperty( "User-Agent", USER_AGENT);
+    con.setRequestProperty( "Accept-Language", "en-US,en;q=0.5");
+    con.setRequestProperty( "Referer", "http://www.topmudsites.com/");
+    con.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
+    con.setRequestProperty( "charset", "utf-8");
+    con.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+    con.setUseCaches( false );
+    con.setDoOutput(true);
+
+    DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+
+    wr.write( postData );
+    wr.flush();
+    wr.close();
+
+    int responseCode = con.getResponseCode();
+
+    // Print info to user, 200 response code should be OK. ( :D )
+    clientGUI.printText("general", "Sending 'POST' request to URL : " + url + "\n");
+    clientGUI.printText("general", "Post parameters : " + urlParameters + "\n");
+    clientGUI.printText("general", "Response Code : " + responseCode + "\n");
+
+    // Disable voting
+    canVote = false;
+}
+
+void enableVote() {
+    canVote = true;
+    clientGUI.printText("general", "Type 'vote' to vote for Batmud on TMS.\n");
+}
+
+public String processCommand() {
+
+    if ( command.equals("vote") && canVote ) {
+        voteTMS();
+        return null;
+    } else if ( command.equals("vote") && !canVote ) {
+        clientGUI.printText("general", "Voting not enabled, type 'voted' or 'voted reset'\n");
+        return null;
+    } else {
+        return command;
+    }   
+}
+
+void bootup() {
+	triggerManager.newTrigger("voted_check",
+		"^Thank you for voting and supporting BatMUD! You may vote again in 12 hours.$",
+		"$"+SCRIPT_NAME+".enableVote", false, false, false, null, Font.PLAIN );
+}
