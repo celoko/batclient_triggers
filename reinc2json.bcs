@@ -37,6 +37,8 @@ StringBuilder s = new StringBuilder();
 // Indexing var
 int rindex = 0;
 
+int oldExp = 0;
+
 void enableReincReader()	{
     enableTrig();
 
@@ -74,13 +76,38 @@ void setDate() {
 void setRaceExp() {
     String level = vars.get(1);
     String race = vars.get(2);
-    String exp = vars.get(3);
-    String ext = vars.get(4);
+    float t_exp = Float.parseFloat(vars.get(3));
+    String t_ext = vars.get(4);
+
+    // Convert exp from M or k
+    int exp = convertExp(t_exp, t_ext);
+    int diffExp = 0;
+
+    // Calculate exp difference
+    if (oldExp != 0) {
+        diffExp = exp - oldExp;
+    }
+    
+    oldExp = exp;
 
     reinc.put("level", level);
     reinc.put("race", race);
-    reinc.put("exp", exp);
-    reinc.put("ext", ext);
+    reinc.put("exp", exp + "");
+    reinc.put("diffExp", diffExp + "");
+}
+
+int convertExp(float exp, String ext) {
+
+    int expi = 0;
+
+    if (ext.equals("M")) {
+        expi = Math.round(exp * 1000000); 
+    } else if (ext.equals("k")) {
+        expi = Math.round(exp * 1000);
+    } else if (exp < 1000) {
+        expi = exp;
+    }
+    return expi;
 }
 
 void setGuilds() {
