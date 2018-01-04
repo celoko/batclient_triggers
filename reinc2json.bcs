@@ -1,0 +1,275 @@
+SCRIPT_NAME = "reinc2json";
+SCRIPT_DESC = "Read reinc data and write to file as JSON";
+
+/*  Usage:
+Type 'rread' to read reincs into array
+Type 'rrwrite' to write data into text file, called 'bat_reinc_data_1.json' by default.
+
+Change lines variable to suit your lines setting.
+Change FILENAME if needed.
+
+V 1.0
+Erygon 2018
+*/
+
+// Lines setting when reading reincs
+int maxLines = 9999;
+
+// Set your preferred lines setting here
+int lines = 65;
+
+// Output filename, if file exists, script is going to increment filename
+FILENAME = "bat_reinc_data";
+
+import java.util.*;
+
+import java.lang.StringBuilder;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
+LinkedHashMap reinc = new LinkedHashMap();
+LinkedHashMap guildList = new LinkedHashMap();
+
+// Main output string
+StringBuilder s = new StringBuilder();
+
+// Indexing var
+int rindex = 0;
+
+void enableReincReader()	{
+    enableTrig();
+
+    clientGUI.doCommand("gagoutput lines " + maxLines);
+    clientGUI.doCommand("show reincs");
+    clientGUI.doCommand("gagoutput lines " + lines);
+
+}
+
+void setDate() {
+
+    reinc.put("weekDay", vars.get(1));
+    reinc.put("month", vars.get(2));
+    reinc.put("day", vars.get(3));
+    reinc.put("hour", vars.get(4));
+    reinc.put("minute", vars.get(5));
+    reinc.put("second", vars.get(6));
+    reinc.put("year", vars.get(7));
+
+    String dyears,ddays,dhours,dmins,dsecs;
+
+    if (vars.get(8) != null) { dyears = vars.get(8).replace("y, ", ""); } else { dyears = "0"; }
+    if (vars.get(10) != null) { ddays = vars.get(10).replace("d, ", ""); } else { ddays = "0"; }
+    if (vars.get(12) != null) { dhours = vars.get(12).replace("h, ", ""); } else { dhours = "0"; }
+    if (vars.get(14) != null) { dmins = vars.get(14).replace("min ", ""); } else { dmins = "0"; }
+    if (vars.get(16) != null) { dsecs = vars.get(16).replace("and ", "").replace("s", ""); } else { dsecs = "0"; }
+
+    reinc.put("dyears", dyears);
+    reinc.put("ddays", ddays);
+    reinc.put("dhours", dhours);
+    reinc.put("dmins", dmins);
+    reinc.put("dsecs", dsecs);
+}
+
+void setRaceExp() {
+    String level = vars.get(1);
+    String race = vars.get(2);
+    String exp = vars.get(3);
+    String ext = vars.get(4);
+
+    reinc.put("level", level);
+    reinc.put("race", race);
+    reinc.put("exp", exp);
+    reinc.put("ext", ext);
+}
+
+void setGuilds() {
+
+    // Remove null elements
+    while(vars.remove(null));
+
+    // Remove every third item, for they are doubles
+    for (int j = vars.size()-3; j >= 1; j-=3) {
+        vars.remove(j);
+    }
+
+    // Write guilds to linkedhashmap
+    for (int n=1;n<vars.size();n+=2) {
+        guildList.put(vars.get(n), vars.get(n+1));
+    }
+}
+
+void endRead() {
+    disableAll();
+}
+
+void enableGuildGrab() {
+    clientGUI.doCommand("/trigenable rrc_disable_guild_grab");
+}
+
+void disableGuildGrab() {
+
+    // Add guilds to reinc
+    if (!guildList.isEmpty()) {
+        reinc.put("guilds", guildList);
+    }
+
+    // Write reinc data to main string
+    writeReinc(reinc);
+
+    // Clear linkedhashmaps for next round
+    guildList.clear();
+    reinc.clear();
+
+    clientGUI.doCommand("/trigdisablerrc_disable_guild_grab");
+}
+
+public String processCommand() {
+
+    if ( command.equals("rread") ) {
+        enableReincReader();
+        return null;
+    } else if ( command.equals("rrwrite") ) {
+        writeJSON();
+        return null;
+    } else {
+        return command;
+    }
+}
+
+void enableTrig() {
+    clientGUI.doCommand("/trigenable rrc_read_date");
+    clientGUI.doCommand("/trigenable rrc_read_race");
+    clientGUI.doCommand("/trigenable rrc_read_guilds");
+    clientGUI.doCommand("/trigenable rrc_enable_guild_grab");
+    clientGUI.doCommand("/trigenable rrc_end_read");
+}
+
+void disableAll() {
+    clientGUI.doCommand("/trigdisable rrc_read_date");
+    clientGUI.doCommand("/trigdisable rrc_read_race");
+    clientGUI.doCommand("/trigdisable rrc_read_guilds");
+    clientGUI.doCommand("/trigdisable rrc_enable_guild_grab");
+    clientGUI.doCommand("/trigdisable rrc_disable_guild_grab");
+    clientGUI.doCommand("/trigdisable rrc_end_read");
+}
+
+void writeReinc(LinkedHashMap r) {
+
+    boolean guilds = false;
+    StringBuilder o = new StringBuilder();
+
+    // Start of new block
+    if (rindex == 0) {
+        o.append("{ \"Reinc_" + rindex + "\": {\n");
+    } else {
+        o.append("},\n  \"Reinc_" + rindex + "\": {\n");    // Write end of last block if not first one
+    }
+    String separator = "";
+
+    // Iterate reinc and add values
+    // When key is guilds, make sub loop to get guild values
+    for (String key: r.keySet()) {
+
+        String line = "         \"" + key + "\": \"" + r.get(key) + "\", \n";
+
+        // Sub loop to add guild data<
+        if (key.equals("guilds")) {
+            StringBuilder gline = new StringBuilder();
+            gline.append("    \"guilds\":   [\n");
+
+            LinkedHashMap g = r.get(key);
+
+            String gseparator = "";
+            for (String gkey: g.keySet()) {
+                if (g.get(gkey).length() > 0) gline.append(gseparator); // If not last, add separator
+                gline.append("      {");
+                gline.append("  \"name\": \"" + gkey + "\",");
+                gline.append("  \"level\": \"" + g.get(gkey) + "\"");
+                gline.append("      }");
+                gseparator = ", \n";
+            }
+            gline.append("           ]\n");
+            line = gline.toString();
+        }
+
+        // Add new line
+        o.append(line);
+    }
+
+    // Append to main string
+    s.append(o);
+    rindex++;   // Increase reinc index
+}
+
+// Writes reincs to file as JSON
+void writeJSON() throws IOException {
+
+    // Add file end parts
+    s.append("  }\n");
+    s.append("}\n");
+  
+    int increase = 1;
+
+    String name = FILENAME + "_" + String.valueOf(increase) + ".json";
+    File file = new File(name);
+
+    while(file.exists()){
+        increase++;
+        name = FILENAME + "_" + String.valueOf(increase) + ".json";
+        file = new File(name);
+    }
+
+    if(!file.exists()) {
+
+    try {
+
+        String output = s.toString();
+        file.createNewFile();
+
+        FileWriter fw = new FileWriter(file.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(output);
+        bw.close();
+
+        clientGUI.printText("general", "Json data written to " + name + "\n");
+
+    }catch (IOException e){
+        e.printStackTrace();
+    }
+    }
+}
+
+void bootup() {
+  triggerManager.newTrigger("rrc_read_date",
+    "^Reinced on (Mon|Tue|Wed|Thu|Fri|Sat|Sun) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]+) ([0-9]+)\\:([0-9]+)\\:([0-9]+) ([0-9]+)\\, lasted for (([0-9]+y), )?(([0-9]+d), )?(([0-9]+h), )?(([0-9]+min) )?(and [0-9]+s)?.$",
+    "$"+SCRIPT_NAME+".setDate", true, false, false,
+    new Color[]{new Color(255,150,150)}, Font.PLAIN);
+
+  triggerManager.newTrigger("rrc_read_race",
+    "^Level ([0-9]+) ([A-Za-z]+) with totals of ([0-9.]+)(k|M|G)$",
+    "$"+SCRIPT_NAME+".setRaceExp", true, false, false,
+    new Color[]{new Color(255,150,150)}, Font.PLAIN);
+
+  triggerManager.newTrigger("rrc_read_guilds",
+    "^[ ]{2}([A-Za-z+ ]+) \\(([0-9]+)\\)[ ]+(([A-Za-z+ ]+) \\(([0-9]+)\\)[ ]+)?(([A-Za-z+ ]+) \\(([0-9]+)\\))?",
+    "$"+SCRIPT_NAME+".setGuilds", true, false, false,
+    new Color[]{new Color(255,150,150)}, Font.PLAIN);
+
+  triggerManager.newTrigger("rrc_enable_guild_grab",
+    "^Guilds and guild levels:$",
+    "$"+SCRIPT_NAME+".enableGuildGrab", true, false, false,
+    new Color[]{new Color(255,150,150)}, Font.PLAIN);
+
+  triggerManager.newTrigger("rrc_disable_guild_grab",
+    "^$",
+    "$"+SCRIPT_NAME+".disableGuildGrab", true, false, false,
+    new Color[]{new Color(255,150,150)}, Font.PLAIN);
+
+  triggerManager.newTrigger("rrc_end_read",
+    "^Total of ([0-9]+) saved reincs.$",
+    "$"+SCRIPT_NAME+".endRead", false, false, false,
+    null, Font.PLAIN);
+
+    disableAll();
+}
