@@ -1,0 +1,233 @@
+SCRIPT_NAME = "nergal_evo_helper";
+SCRIPT_DESC = "Helper script to navigate Nergal evolution tree";
+
+// Version 1.0
+// Erygon 2019
+
+String prefix = "neh";
+
+// Show details after move
+boolean autoDetails = true;
+
+// Show tree after move
+boolean autoView = false;
+
+// USAGE:
+// neh <path><node number>
+// neh d2
+
+// neh list disease/minion/stats to see list of bonuses
+
+// d disease, m minion, s stats
+
+// Coordinates, these follow numbering in tazliels site
+// https://sites.google.com/site/battazliel/home/servants-of-nergal
+
+String[] disease = new String[22];
+disease[0] = "0,0,Disease";
+disease[1] = "9,9,1 Prolonging inevitable\tdiseases gain 1% extra duration upon infection";
+disease[2] = "16,8,2 Amplified viruses #2\tdiseases gain 2% extra potency based on evolution rep";
+disease[3] = "19,8,3 Swift contagiousness #1\tdisease have extra 3% chance to infect victim upon hit";
+
+disease[4] = "10,14,4 Prolonging inevitable #2\tdiseases gain 1% extra duration upon infection";
+disease[5] = "15,13,5 Virulent Infection\t\tUpon infection your diseases gain 30% increased effect";
+disease[6] = "20,13,6 Swift contagiousness #2\tdiseases have extra 3% chance to infect victim upon hit";
+
+disease[7] = "12,17,7 Amplified viruses #1\tdiseases gain 2% extra potency based on your evolution reputation";
+disease[8] = "18,17,8 Prolonging inevitable #4\tdiseases gain 1% extra duration upon infection";
+disease[9] = "26,17,9 Disease carrier\t\tIncrease number maximum number of diseases on target by 1";
+
+disease[10] = "11,19,10 Lasting impression\tUpon infection disease gain +30% duration";
+disease[11] = "16,19,11 Prolonging inevitable #3\tdiseases gain 1% extra duration upon infection";
+disease[12] = "22,19,12 Amplified viruses #3\tdiseases gain 2% extra potency based on your evolution reputation";
+
+disease[13] = "18,24,13 Swift contagiousness #3\tdiseases have extra 3% chance to infect victim upon hit";
+disease[14] = "24,24,14 Patient zero\t\tYou become immune to all curses and diseases";
+disease[15] = "27,24,15 Amplified viruses #4\tdiseases gain 2% extra potency based on your evolution reputation";
+disease[16] = "29,22,16 Swift contagiousness #5\tdiseases have extra 3% chance to infect victim upon hit";
+
+disease[17] = "22,26,17 Swift contagiousness #4\tdiseases have extra 3% chance to infect victim upon hit";
+disease[18] = "24,26,18 Prolonging inevitable #5\tdiseases gain 1% extra duration upon infection";
+disease[19] = "32,24,19 Plaguebearer\t\tIncrease number maximum number of diseases on target by 1";
+
+disease[20] = "26,32,20 Compromised immune system\tCombined effect of diseases lowers resistances on monster";
+disease[21] = "32,29,21 Vigorous contagion\tMinions gain chance to inflict disease while casting spells";
+
+String[] minion = new String[29];
+minion[0] = "0,0,Minion";
+minion[1] = "31,8,1 Vanguard of the Hive\tmakes neutral tanking skills available to minions";
+minion[2] = "38,8,2 Enhanced shape #1\t\tyour minions gain 10% increased regen from your spr";
+minion[3] = "43,8,3 Cabal of the Hive\t\tmakes neutral caster skills available to minions";
+
+minion[4] = "28,10,4 Increased vitality #1\tYour minions gain 1.5% increase on their ht point max";
+minion[5] = "40,10,5 Adept parasites\t\tIncreases amount of minions by 1";
+
+minion[6] = "28,11,6 Torment tolerance #1\tminions gain 5% resist all";
+minion[7] = "32,11,7 Cartilage shell\t\tIncrease the resistances of minions";
+minion[8] = "45,11,8 Lasting spirit #1\t\tminions gain 2.5% spmax";
+
+minion[9] = "28,14,9 Adaptive supremacy\t\tIncreased minion characteristics (by a lot)";
+minion[10] = "32,14,10 Hardened carapace\t\tIncreased critical strike resistance";
+minion[11] = "38,14,11 Hive awareness\t\tdecrease area damage, gain essence eye";
+minion[12] = "44,14,12 Lasting spirit #2\t\tminions gain 2.5% spmax";
+
+minion[13] = "30,16,13 Increased vitality #2\tminions gain 1.5% hpmax";
+minion[14] = "43,16,14 Essence affliction\tTransforms physical strength to mental capacity";
+
+minion[15] = "35,19,15 Chitinous hide\t\tIncreased natural protection";
+minion[16] = "37,19,16 Harbringer of the Hive\tIncrease the amount of minions by 1";
+minion[17] = "40,19,17 Lasting spirit #3\t\tminions gain 2.5% spmax";
+minion[18] = "48,19,18 Enhanced shape #2\t\tminions gain 10% increased regeneration from your spr";
+
+minion[19] = "34,22,19 Increased vitality #3\tminions gain 1.5% hpmax";
+minion[20] = "39,22,20 Hunger for power\t\tIncreased effect of legacy of enthralled on minions";
+minion[21] = "45,22,21 Shared burden\t\tReduced spell costs";
+minion[22] = "50,22,22 Together as one\t\tIncreased discipline while spell casting";
+
+minion[23] = "36,25,23 Hives embrace\t\tIncreased stun resistance";
+minion[24] = "40,25,24 Torment tolerance #2\tminions gain 5% resist all";
+minion[25] = "47,25,25 Lasting spirit #4\t\tminions gain 2.5% spmax";
+
+minion[26] = "41,27,26 Torment tolerance #3\tminions gain 5% resist all";
+
+minion[27] = "41,30,27 Claws of spiked bone\ttransforms limbs to claws and increases damage";
+minion[28] = "45,30,28 Shared focus\t\tReduced rounds in spell casting";				
+
+String[] stats = new String[27];
+stats[0] = "0,0,Stats";
+stats[1] = "56,7,1 Enhanced physical evolution #1\t\tIncrease tank specific stats by 1";
+stats[2] = "62,8,2 Enhanced mental evolution #1\t\tIncreases caster specific stats by 1";
+
+stats[3] = "58,10,3 Enhanced physical evolution #2\tIncreases tank specific stats by 1";
+stats[4] = "66,10,4 Enhanced regeneration evolution #1\t+2 hpr and +2 spr";
+
+stats[5] = "60,12,5 Reverse reaction\t\t\t+3 super char";
+stats[6] = "71,12,6 Enhanced regeneration evolution #3\t+2 hpr and +2 spr";
+
+stats[7] = "49,14,7 Fevered awareness\t\t\tIncreased natural senses";
+stats[8] = "55,14,8 Enhanced mental evolution #2\t\t+2 hpr and +2 spr";
+stats[9] = "65,14,9 Enhanced physical evolution #3\tIncreased tank specific stats by 1";
+
+stats[10] = "47,16,10 Enhanced mental evolution #3\tIncreased caster specific stats by 1";
+stats[11] = "51,16,11 Robust hide\t\t\tIncreased natural protection values";
+stats[12] = "61,15,12 Enhanced regeneration evolution #2\t+2 hpr and +2 spr";
+stats[13] = "69,16,13 Exalting inflamation\t\t+3 super char";
+
+stats[14] = "50,18,14 Enhanced mental evolution #4\tIncreased caster stats by 1";
+stats[15] = "57,18,15 Enhanced mental evolution #5\tIncreases caster stats by 1";
+stats[16] = "62,18,16 Enhanced mental evolution #6\tIncreases caster stats by 1";
+
+stats[17] = "55,20,17 Enhanced physical evolution #4\tIncreases tank stats by 1";
+stats[18] = "65,19,18 Enhanced regeneration evolution #4\t+2 hpr and +2 spr";
+stats[19] = "68,20,19 Enhanced mental evolution #7\tIncreases caster stats by 1";
+
+stats[20] = "53,23,20 Enhanced physical evolution #5\tIncreases tank stats by 1";
+stats[21] = "60,22,21 Enhanced regeneration evolution #5\t+2 hpr and +2 spr";
+stats[22] = "70,22,22 Evolution unchained\t\tWhen legacy of enthralled is cast upon a player, target stat gain is increased by 25%";
+
+stats[23] = "52,26,23 Enhanced physical evolution #6\tIncreases tank stats by 1";
+stats[24] = "58,25,24 Essence collector\t\t\tDrain mana and hp from living affected by diseases on hit";
+stats[25] = "61,26,25 Enhanced regeneration evolution #6\t+2 hpr and +2 spr";
+
+stats[26] = "56,32,26 Residual trauma\t\t\tGain the ‘reactant tissue’ mutation for absorb effect";						
+
+void moveCursor(String x, String y) {
+    // reset cursor location to 0,0
+    clientGUI.doCommand("@@gagoutput point 500 nw");
+
+    // Do moves
+    clientGUI.doCommand("@@gagoutput point " + y + " s");
+    clientGUI.doCommand("@@gagoutput point " + x + " e");
+
+    if (autoDetails) {
+        clientGUI.doCommand("@@details");
+    }
+
+    if (autoView) {
+        clientGUI.doCommand("@@view");
+    }
+}
+
+void printNodes(String[] path) {
+    for (String n: path) {
+        String effect = n.split(",")[2];
+        clientGUI.printText("general", effect + "\n");
+    }
+}
+
+void printHelp() {
+    clientGUI.printText("general", "Nergal evolution tree helper\n\n");
+    clientGUI.printText("general", "neh list disease/minion/stats - to see list of bonuses\n\n");
+    clientGUI.printText("general", "neh <path><node> - to move to certain node\n");
+    clientGUI.printText("general", "neh d2 - moves to second node on disease path\n\n");
+
+    clientGUI.printText("general", "Show details after move: " + autoDetails + "\n");
+    clientGUI.printText("general", "Show view after move: "+ autoView + "\n");
+
+    clientGUI.printText("general", "\nYou can toggle autoDetails and autoView in script.\n");
+}
+
+public String processCommand() {
+
+    // Temp var for path
+    String[] road;
+
+    // List commands
+    if (command.equals(prefix + " list disease")) {
+        printNodes(disease);
+        return null;
+    } else if (command.equals(prefix + " list minion")) {
+        printNodes(minion);
+        return null;
+    } else if (command.equals(prefix + " list stats")) {
+        printNodes(stats);
+        return null;
+    } else if (command.equals(prefix + " help")) {
+        printHelp();
+        return null;
+    } else if ( command.startsWith(prefix) ) {
+
+        // Movement handling
+
+        // Remove prefix + " "
+        String tcommand = command.replace(prefix + " ", "");
+
+        // Try to catch some wrong commands
+        if (tcommand.length() > 3) {
+
+            return null;
+        }
+
+        // Split first letter and number
+        String path = tcommand.substring(0,1);
+        int node = Integer.parseInt(tcommand.substring(1,tcommand.length()));     
+
+        if (path.equals("d")) {
+            road = disease;
+        } else if (path.equals("m")) {
+            road = minion;
+        } else if (path.equals("s")) {
+            road = stats;
+        } else { 
+            clientGUI.printText("general", "Wrong path.\n");
+            return null; }
+
+        if (node > 0 && node < road.length) {
+
+            String x = road[node].split(",")[0];
+            String y = road[node].split(",")[1];
+
+            moveCursor(x, y);
+        } else {
+            clientGUI.printText("general", "Node number out of bounds. (1 - " + (road.length-1) + ")\n");
+        }
+
+        // Dont send original command to mud
+        return null;
+    } else { 
+        // Send command to mud = do nothing
+        return command;
+    }
+}
+
+
