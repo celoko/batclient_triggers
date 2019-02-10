@@ -158,7 +158,7 @@ void printNodes(String[] path) {
 void printHelp() {
     clientGUI.printText("general", "Nergal evolution tree helper\n\n");
     clientGUI.printText("general", "neh list disease/minion/stats - to see list of bonuses\n\n");
-    clientGUI.printText("general", "neh <path><node> - to move to certain node\n");
+    clientGUI.printText("general", "neh <path><node> - to move to certain node, d disease, m minion, s stats\n");
     clientGUI.printText("general", "neh d2 - moves to second node on disease path\n\n");
 
     clientGUI.printText("general", "Show details after move: " + autoDetails + "\n");
